@@ -851,28 +851,58 @@
   function onCodigoLido(txt) {
     if (scannerLido) return;
     scannerLido = true;
-
-    var cod = String(txt).replace('Ped:', '').split('|')[0].trim();
+  
+    var cod = String(txt || '')
+      .replace('Ped:', '')
+      .split('|')[0]
+      .trim();
+  
+    if (!cod) {
+      scannerLido = false;
+      return;
+    }
+  
+    // ESCREVE NA CAIXA ID MATERIAL
+    var campoIdMaterial = document.getElementById('idMaterial');
+  
+    if (campoIdMaterial) {
+      campoIdMaterial.value = cod;
+  
+      // Força o navegador a reconhecer que o campo mudou
+      campoIdMaterial.dispatchEvent(new Event('input', { bubbles: true }));
+      campoIdMaterial.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  
+    // Mostra na tela do scanner
     var statusEl = document.getElementById('scannerStatus');
-    statusEl.className = 'scanner-status ok';
-    statusEl.textContent = '✅ ' + cod;
-
+    if (statusEl) {
+      statusEl.className = 'scanner-status ok';
+      statusEl.textContent = '✅ ID Material lido: ' + cod;
+    }
+  
+    // Feedback visual no formulário
+    setMsg('msgItem', 'ID Material preenchido: ' + cod, 'ok');
+  
+    if (navigator.vibrate) {
+      navigator.vibrate([100]);
+    }
+  
     tocarBip();
-    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
-
-    if (scannerAtivo) scannerAtivo.stop().catch(function(){});
-
+  
+    // Fecha o scanner e volta para o formulário
     setTimeout(function() {
       fecharScanner();
-      document.getElementById('idMaterial').value = cod;
-
-      var scanStatus = document.getElementById('scanStatus');
-      scanStatus.style.cssText = 'display:block; background:#ecfdf3; color:#027a48; border:1px solid #abefc6; border-radius:12px; padding:10px 13px; font-size:.85rem;';
-      scanStatus.textContent = '✅ Código lido: ' + cod;
-      setMsg('msgItem', 'ID Material lido: ' + cod, 'ok');
-
-      setTimeout(function() { scanStatus.style.display = 'none'; focarCampoPrincipal(); }, 2500);
-    }, 900);
+  
+      setTimeout(function() {
+        var campoIdMaterialFinal = document.getElementById('idMaterial');
+  
+        if (campoIdMaterialFinal) {
+          campoIdMaterialFinal.value = cod;
+        }
+  
+        focarCampoPrincipal();
+      }, 250);
+    }, 500);
   }
 
   function fecharScanner() {
