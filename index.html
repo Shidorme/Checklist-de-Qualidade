@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Checklist de Qualidade</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --verde: #007a3d;
+      --verde-escuro: #004533;
+      --verde-claro: #e8f5ee;
+      --fundo: #f3f6f5;
+      --branco: #ffffff;
+      --texto: #101828;
+      --muted: #667085;
+      --borda: #d0d5dd;
+      --erro: #b42318;
+      --erro-bg: #fef3f2;
+      --ok: #027a48;
+      --ok-bg: #ecfdf3;
+      --preto: #101828;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100%; min-height: 100%; margin: 0; padding: 0;
+      background: var(--fundo); color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif; overflow-x: hidden;
+    }
+
+    body { font-size: 18px; }
+
+    /* ── TELA DE LOGIN ── */
+    #telaLogin {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 100dvh;
+      padding: 24px 20px; background: var(--fundo);
+    }
+
+    .login-card {
+      width: 100%; max-width: 420px;
+      background: white; border-radius: 24px; padding: 32px 24px;
+      box-shadow: 0 8px 32px rgba(16,24,40,.12);
+      border: 1px solid #e7ecea; text-align: center;
+    }
+
+    .login-logo {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 64px; height: 64px; border-radius: 18px;
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde));
+      margin-bottom: 20px; font-size: 2rem;
+    }
+
+    .login-card h1 { font-size: 1.3rem; color: var(--verde-escuro); margin: 0 0 6px; }
+    .login-card p  { font-size: 0.88rem; color: var(--muted); margin: 0 0 24px; }
+
+    .login-card input {
+      width: 100%; min-height: 52px; border: 1px solid var(--borda);
+      border-radius: 14px; padding: 13px; font-size: 1rem;
+      background: white; color: var(--texto); outline: none;
+      margin-bottom: 12px; appearance: none;
+    }
+
+    .login-card input:focus { border-color: var(--verde); box-shadow: 0 0 0 4px rgba(0,122,61,.1); }
+
+    .btn-login {
+      width: 100%; min-height: 52px; border: 0; border-radius: 14px;
+      background: var(--verde); color: white; font-size: 1rem;
+      font-weight: 800; cursor: pointer; margin-top: 4px;
+      box-shadow: 0 4px 12px rgba(0,122,61,.22);
+    }
+
+    .btn-login:disabled { opacity: .55; cursor: not-allowed; }
+    .msg-login { margin-top: 12px; font-size: .85rem; color: var(--erro); display: none; }
+
+    /* ── APP PRINCIPAL ── */
+    #telaApp { display: none; }
+
+    .app { width: 100%; max-width: 560px; margin: 0 auto; padding: 0 12px 28px; }
+
+    .topo {
+      margin: 0 -12px 12px; padding: 18px 16px 20px;
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde));
+      color: white; border-radius: 0 0 22px 22px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.16);
+    }
+
+    .topo-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+
+    .topo .tag {
+      display: inline-block; margin-bottom: 8px; padding: 5px 9px;
+      border-radius: 999px; background: rgba(255,255,255,.16);
+      font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+    }
+
+    .topo h1 { margin: 0; font-size: 1.42rem; line-height: 1.15; }
+    .topo p  { margin: 8px 0 0; font-size: .88rem; line-height: 1.35; opacity: .95; }
+
+    .btn-sair {
+      flex-shrink: 0; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+      color: white; font-size: .75rem; font-weight: 700; border-radius: 10px;
+      padding: 6px 10px; cursor: pointer; min-height: unset; width: auto; margin-top: 4px;
+    }
+
+    .card {
+      width: 100%; background: var(--branco); border: 1px solid #e7ecea;
+      border-radius: 20px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 5px 18px rgba(16,24,40,.08);
+    }
+
+    .card h2 {
+      display: flex; align-items: center; gap: 8px;
+      margin: 0 0 14px; font-size: 1.08rem; color: var(--verde-escuro); line-height: 1.25;
+    }
+
+    .step {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 999px;
+      background: var(--verde); color: white; font-size: .82rem; flex: 0 0 auto;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 13px; width: 100%; }
+
+    .campo { display: flex; flex-direction: column; width: 100%; gap: 6px; }
+    .campo.full { grid-column: 1 / -1; }
+
+    label { font-size: .72rem; font-weight: 800; color: #344054; text-transform: uppercase; letter-spacing: .35px; }
+
+    input, select, textarea {
+      width: 100%; min-height: 58px; border: 1px solid var(--borda);
+      border-radius: 16px; padding: 14px 13px; font-size: 1rem;
+      background: white; color: var(--texto); outline: none; appearance: none;
+    }
+
+    select {
+      background-image: linear-gradient(45deg,transparent 50%,#667085 50%),linear-gradient(135deg,#667085 50%,transparent 50%);
+      background-position: calc(100% - 20px) 50%,calc(100% - 14px) 50%;
+      background-size: 6px 6px,6px 6px; background-repeat: no-repeat; padding-right: 36px;
+    }
+
+    textarea { min-height: 104px; resize: vertical; line-height: 1.35; }
+
+    input[type="file"] { min-height: 58px; padding: 14px 12px; font-size: .88rem; background: #f9fafb; border-style: dashed; }
+    input:disabled, select:disabled { background: #f4f6f5; color: #475467; opacity: 1; }
+    input:focus, select:focus, textarea:focus { border-color: var(--verde); box-shadow: 0 0 0 4px rgba(0,122,61,.12); }
+
+    .linha-info {
+      display: none; position: sticky; top: 0; z-index: 20;
+      margin-bottom: 12px; padding: 12px 13px; border: 1px solid #b7e4c7;
+      border-radius: 18px; background: #e9f8ef; color: #12372a;
+      box-shadow: 0 5px 16px rgba(16,24,40,.08); font-size: .83rem; line-height: 1.35;
+    }
+
+    .linha-info div { margin-bottom: 4px; word-break: break-word; }
+    .linha-info div:last-child { margin-bottom: 0; }
+    .linha-info strong { color: var(--verde-escuro); }
+
+    .acoes { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; width: 100%; }
+
+    button {
+      width: 100%; min-height: 58px; border: 0; border-radius: 17px;
+      padding: 14px 16px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: .15s ease;
+    }
+
+    button:active { transform: scale(.99); }
+    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .btn-principal { background: var(--verde); color: white; box-shadow: 0 5px 12px rgba(0,122,61,.22); }
+    .btn-principal:hover { background: var(--verde-escuro); }
+    .btn-finalizar { background: var(--preto); color: white; }
+    .btn-limpar { background: #eef1f0; color: #344054; }
+    .btn-camera { background: #e8f5ee; color: var(--verde-escuro); border: 1px solid #b7e4c7; }
+
+    .msg { display: none; margin-top: 12px; border-radius: 16px; padding: 13px; font-size: .9rem; line-height: 1.4; }
+    .msg.ok  { display: block; background: var(--ok-bg);   color: var(--ok);   border: 1px solid #abefc6; }
+    .msg.erro{ display: block; background: var(--erro-bg); color: var(--erro); border: 1px solid #fecdca; }
+
+    .contador-box {
+      display: none; margin-bottom: 12px; padding: 12px 14px;
+      border-radius: 18px; background: white; border: 1px solid #e7ecea;
+      box-shadow: 0 4px 14px rgba(16,24,40,.06);
+    }
+
+    .contador-box span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .35px; }
+    .contador-box strong { display: block; margin-top: 4px; color: var(--verde-escuro); font-size: 1.3rem; }
+
+    .historico { margin-top: 14px; padding-top: 12px; border-top: 1px solid #edf0ef; font-size: .85rem; line-height: 1.4; color: #475467; }
+    .historico strong { color: var(--texto); }
+    .historico ul { padding-left: 18px; margin: 8px 0 0; }
+    .historico li { margin-bottom: 6px; }
+
+    .resumo { display: none; background: white; border: 1px solid #e7ecea; border-radius: 20px; padding: 16px; margin-top: 12px; box-shadow: 0 5px 18px rgba(16,24,40,.08); }
+    .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+
+    .mini-card { background: #f9fafb; border: 1px solid #eaecf0; border-radius: 16px; padding: 12px 8px; text-align: center; }
+    .mini-card span { display: block; color: var(--muted); font-size: .68rem; line-height: 1.2; font-weight: 700; text-transform: uppercase; }
+    .mini-card strong { display: block; margin-top: 5px; font-size: 1.15rem; color: var(--verde-escuro); }
+
+    .oculto { display: none !important; }
+
+    /* ── SCANNER OVERLAY ── */
+    #scannerOverlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: #000; flex-direction: column;
+    }
+
+    #scannerOverlay.ativo { display: flex; }
+
+    .scanner-topo {
+      padding: 16px; background: #004533;
+      text-align: center; font-size: 1rem; font-weight: 800; color: white;
+    }
+
+    .scanner-sub { font-size: .75rem; font-weight: 400; opacity: .8; margin-top: 3px; }
+
+    #scannerReader { width: 100%; flex: 1; background: #000; }
+    #scannerReader video { width: 100% !important; height: 100% !important; object-fit: cover; }
+
+    #scannerReader #qr-shaded-region { border-width: 2px !important; }
+    #scannerReader #html5-qrcode-anchor-scan-type-change { display: none !important; }
+    #scannerReader #html5-qrcode-button-camera-stop { display: none !important; }
+
+    .scanner-status {
+      padding: 14px 16px; text-align: center; font-size: .9rem;
+      background: #111; color: white; min-height: 52px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .scanner-status.ok   { background: #027a48; font-size: 1rem; font-weight: 700; }
+    .scanner-status.erro { background: #b42318; font-size: .85rem; }
+
+    .btn-scanner-fechar {
+      margin: 10px 16px; padding: 14px; border: 0; border-radius: 14px;
+      background: #333; color: white; font-size: 1rem; font-weight: 700; cursor: pointer;
+      width: calc(100% - 32px); min-height: unset;
+    }
+
+    @media (min-width: 700px) {
+      body { font-size: 17px; }
+      .app { max-width: 620px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ TELA DE LOGIN ══════════ -->
+<div id="telaLogin">
+  <div class="login-card">
+    <div class="login-logo">✅</div>
+    <h1>Checklist de Qualidade</h1>
+    <p>Acesso restrito a colaboradores da empresa.<br>Use seu e-mail corporativo.</p>
+
+    <input type="email" id="loginEmail" placeholder="seu@empresa.com.br" autocomplete="email">
+    <input type="password" id="loginSenha" placeholder="Senha" autocomplete="current-password">
+
+    <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Entrar</button>
+    <div class="msg-login" id="msgLogin"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCANNER OVERLAY ══════════ -->
+<div id="scannerOverlay">
+  <div class="scanner-topo">
+    📷 Leitor de Código
+    <div class="scanner-sub">Aponte para código de barras ou QR Code</div>
+  </div>
+  <div id="scannerReader"></div>
+  <div class="scanner-status" id="scannerStatus">Iniciando câmera...</div>
+  <button class="btn-scanner-fechar" onclick="fecharScanner()">Cancelar</button>
+</div>
+
+<!-- ══════════ APP PRINCIPAL ══════════ -->
+<div id="telaApp">
+  <div class="app">
+    <div class="topo">
+      <div class="topo-header">
+        <div>
+          <span class="tag">Geo System Qualidade</span>
+          <h1>Checklist de Qualidade</h1>
+          <p>Recebimento de material com conferência, evidência fotográfica e rastreio por remessa.</p>
+        </div>
+        <button class="btn-sair" onclick="sair()">Sair</button>
+      </div>
+    </div>
+
+    <div class="card" id="cardRemessa">
+      <h2><span class="step">1</span> Dados da remessa</h2>
+      <div class="grid">
+        <div class="campo"><label>Responsável</label><select id="responsavel"></select></div>
+        <div class="campo"><label>Fornecedor</label><select id="fornecedor"></select></div>
+        <div class="campo"><label>Nota Fiscal</label><input id="nf" type="text" inputmode="numeric" placeholder="Ex: 48021"></div>
+        <div class="campo"><label>Pedido de compra</label><input id="pedidoCompra" type="text" placeholder="Ex: PC 12345"></div>
+        <div class="campo"><label>Tipo de conferência</label><select id="tipoConferencia" onchange="atualizarMateriaisPorTipo()"></select></div>
+        <div class="campo"><label>Material principal</label><select id="materialRemessa"></select></div>
+      </div>
+      <div class="acoes">
+        <button class="btn-principal" onclick="iniciar()" id="btnIniciar">Iniciar remessa</button>
+      </div>
+      <div id="msgRemessa" class="msg"></div>
+    </div>
+
+    <div class="linha-info" id="boxRemessa">
+      <div><strong>ID Remessa:</strong> <span id="txtIdRemessa"></span></div>
+      <div><strong>Responsável:</strong> <span id="txtResponsavel"></span></div>
+      <div><strong>Fornecedor:</strong> <span id="txtFornecedor"></span></div>
+      <div><strong>NF:</strong> <span id="txtNf"></span></div>
+      <div><strong>Pedido Compra:</strong> <span id="txtPedidoCompra"></span></div>
+      <div><strong>Tipo:</strong> <span id="txtTipoConferencia"></span></div>
+    </div>
+
+    <div class="contador-box" id="boxContador">
+      <span>Conferências lançadas nesta remessa</span>
+      <strong id="txtContador">0</strong>
+    </div>
+
+    <div class="card oculto" id="cardItem">
+      <h2><span class="step">2</span> Adicionar conferência</h2>
+      <div class="grid">
+        <div class="campo">
+          <label>ID Material</label>
+          <input id="idMaterial" type="text" placeholder="Leia o código pela câmera" autocomplete="off" readonly>
+        </div>
+
+        <div class="acoes" style="margin-top:0">
+          <button type="button" class="btn-camera" onclick="abrirScanner()" id="btnAbrirScanner">
+            📷 Abrir câmera para ler ID Material
+          </button>
+        </div>
+
+        <div id="scanStatus" style="display:none; padding:10px 13px; border-radius:12px; font-size:.85rem;"></div>
+
+        <div class="campo"><label>Material</label><select id="materialItem"></select></div>
+        <div class="campo"><label>Lote</label><input id="lote" type="text" placeholder="Opcional"></div>
+
+        <div class="campo" id="campoPeso">
+          <label>Peso informado</label>
+          <input id="pesoInformado" type="text" inputmode="decimal" placeholder="Ex: 29,40" oninput="formatarDecimalVirgula(this)">
+        </div>
+        <div class="campo oculto" id="campoMetragem">
+          <label>Metragem informada</label>
+          <input id="metragemInformada" type="text" inputmode="decimal" placeholder="Ex: 12,50" oninput="formatarDecimalVirgula(this)">
+        </div>
+        <div class="campo oculto" id="campoMicragem">
+          <label>Micragem informada</label>
+          <input id="micragemInformada" type="text" inputmode="decimal" placeholder="Ex: 0,80" oninput="formatarDecimalVirgula(this)">
+        </div>
+
+        <div class="campo"><label>Unidade</label><select id="unidade"></select></div>
+        <div class="campo"><label>Condição do material</label><select id="condicaoMaterial"></select></div>
+        <div class="campo"><label>Status inspeção</label><select id="statusInspecao"></select></div>
+        <div class="campo full"><label>Observação</label><textarea id="observacao" placeholder="Opcional"></textarea></div>
+        <div class="campo"><label id="lblFotoPrincipal">Foto material + peso</label><input id="fotoMaterial" type="file" accept="image/*" capture="environment"></div>
+        <div class="campo"><label id="lblFotoSecundaria">Foto somente do peso</label><input id="fotoPeso" type="file" accept="image/*" capture="environment"></div>
+      </div>
+
+      <div class="acoes">
+        <button class="btn-principal" onclick="salvarItem()" id="btnSalvarItem">Salvar conferência</button>
+        <button class="btn-finalizar" onclick="finalizar()" id="btnFinalizar">Finalizar remessa</button>
+        <button class="btn-limpar oculto" onclick="iniciarNovaConferencia()" id="btnNovaConferencia">Iniciar nova conferência</button>
+      </div>
+
+      <div id="msgItem" class="msg"></div>
+      <div class="historico">
+        <strong>Últimas conferências lançadas:</strong>
+        <ul id="listaItens"></ul>
+      </div>
+    </div>
+
+    <div class="card resumo" id="cardResumo">
+      <h2><span class="step">3</span> Resumo da remessa</h2>
+      <p id="resumoTexto"></p>
+      <div class="resumo-grid">
+        <div class="mini-card"><span>Total de itens</span><strong id="resTotalItens">0</strong></div>
+        <div class="mini-card"><span id="resumoMedidaLabel">Peso total</span><strong id="resumoMedidaValor">0</strong></div>
+        <div class="mini-card"><span>Aprovados</span><strong id="resAprovados">0</strong></div>
+        <div class="mini-card"><span>Pend./Reprov.</span><strong id="resPendentes">0</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ════════════════════════════════════════════════════════
+  // CONFIGURAÇÃO — altere apenas esta linha
+  // ════════════════════════════════════════════════════════
+  var API_URL = 'COLE_AQUI_A_URL_DO_DEPLOY_DO_APPS_SCRIPT';
+  var DOMINIO_PERMITIDO = 'suaempresa.com.br'; // domínio do e-mail corporativo
+
+  // ════════════════════════════════════════════════════════
+  // LOGIN
+  // ════════════════════════════════════════════════════════
+  var usuarioLogado = null;
+
+  function fazerLogin() {
+    var email = document.getElementById('loginEmail').value.trim();
+    var senha = document.getElementById('loginSenha').value;
+    var msgEl = document.getElementById('msgLogin');
+    var btn   = document.getElementById('btnLogin');
+
+    msgEl.style.display = 'none';
+
+    if (!email || !senha) {
+      msgEl.textContent = 'Preencha e-mail e senha.';
+      msgEl.style.display = 'block'; return;
+    }
+
+    if (!email.endsWith('@' + DOMINIO_PERMITIDO)) {
+      msgEl.textContent = 'Acesso permitido apenas para e-mails @' + DOMINIO_PERMITIDO + '.';
+      msgEl.style.display = 'block'; return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    // Valida credenciais no backend
+    chamarAPI('login', { email: email, senha: senha })
+      .then(function(resp) {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        if (resp.ok) {
+          usuarioLogado = { email: email };
+          sessionStorage.setItem('usuario', email);
+          mostrarApp();
+        } else {
+          msgEl.textContent = resp.mensagem || 'E-mail ou senha incorretos.';
+          msgEl.style.display = 'block';
+        }
+      })
+      .catch(function(err) {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        msgEl.textContent = 'Erro de conexão. Tente novamente.';
+        msgEl.style.display = 'block';
+      });
+  }
+
+  function mostrarApp() {
+    document.getElementById('telaLogin').style.display = 'none';
+    document.getElementById('telaApp').style.display = 'block';
+    carregarApp();
+  }
+
+  function sair() {
+    sessionStorage.removeItem('usuario');
+    usuarioLogado = null;
+    window.location.reload();
+  }
+
+  // Verifica sessão ao carregar
+  window.addEventListener('DOMContentLoaded', function() {
+    var email = sessionStorage.getItem('usuario');
+    if (email) {
+      usuarioLogado = { email: email };
+      mostrarApp();
+    }
+
+    // Enter no campo de senha faz login
+    document.getElementById('loginSenha').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') fazerLogin();
+    });
+  });
+
+  // ════════════════════════════════════════════════════════
+  // API — chama o Apps Script via fetch
+  // ════════════════════════════════════════════════════════
+  function chamarAPI(acao, dados) {
+    var url = API_URL + '?acao=' + acao;
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(dados || {})
+    }).then(function(r) { return r.json(); });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // APP — estado e cadastros
+  // ════════════════════════════════════════════════════════
+  var estado = {
+    idRemessa: '', responsavel: '', fornecedor: '', nf: '',
+    pedidoCompra: '', tipoConferencia: '', material: '', itensLancados: 0
+  };
+
+  var cadastrosApp = {
+    responsaveis: [], fornecedores: [], materiaisPesagem: [],
+    materiaisMetragem: [], materiaisMicragem: [], unidades: [],
+    condicoes: [], status: [], tiposConferencia: []
+  };
+
+  function carregarApp() {
+    setMsg('msgRemessa', 'Carregando listas...', 'ok');
+    chamarAPI('carregarDadosApp', {})
+      .then(function(resp) {
+        if (!resp || !resp.ok) { setMsg('msgRemessa', 'Erro ao carregar cadastros.', 'erro'); return; }
+        cadastrosApp = resp.cadastros;
+        preencherSelect('responsavel', cadastrosApp.responsaveis);
+        preencherSelect('fornecedor', cadastrosApp.fornecedores);
+        preencherSelect('tipoConferencia', cadastrosApp.tiposConferencia);
+        preencherSelect('unidade', cadastrosApp.unidades);
+        preencherSelect('condicaoMaterial', cadastrosApp.condicoes);
+        preencherSelect('statusInspecao', cadastrosApp.status);
+        preencherSelect('materialRemessa', []);
+        preencherSelect('materialItem', []);
+        setMsg('msgRemessa', '', '');
+      })
+      .catch(function(err) { setMsg('msgRemessa', 'Erro de conexão: ' + err.message, 'erro'); });
+  }
+
+  function preencherSelect(id, lista) {
+    var el = document.getElementById(id);
+    el.innerHTML = '<option value="">Selecione...</option>';
+    (lista || []).forEach(function(item) {
+      var opt = document.createElement('option');
+      opt.value = item; opt.textContent = item; el.appendChild(opt);
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // REMESSA
+  // ════════════════════════════════════════════════════════
+  function iniciar() {
+    var dados = {
+      responsavel: getVal('responsavel'), fornecedor: getVal('fornecedor'),
+      nf: getVal('nf'), pedidoCompra: getVal('pedidoCompra'),
+      tipoConferencia: getVal('tipoConferencia'), material: getVal('materialRemessa'),
+      usuarioEmail: usuarioLogado ? usuarioLogado.email : ''
+    };
+
+    if (!dados.responsavel || !dados.fornecedor || !dados.nf || !dados.pedidoCompra || !dados.tipoConferencia || !dados.material) {
+      setMsg('msgRemessa', 'Preencha todos os campos obrigatórios.', 'erro'); return;
+    }
+
+    var btn = document.getElementById('btnIniciar');
+    btn.disabled = true; btn.textContent = 'Iniciando...';
+
+    chamarAPI('iniciarRemessa', dados)
+      .then(function(resp) {
+        btn.disabled = false; btn.textContent = 'Iniciar remessa';
+        if (!resp || !resp.ok) { setMsg('msgRemessa', resp.mensagem || 'Erro ao iniciar remessa.', 'erro'); return; }
+
+        estado.idRemessa = resp.idRemessa;
+        estado.responsavel = dados.responsavel; estado.fornecedor = dados.fornecedor;
+        estado.nf = dados.nf; estado.pedidoCompra = dados.pedidoCompra;
+        estado.tipoConferencia = dados.tipoConferencia; estado.material = dados.material;
+        estado.itensLancados = 0;
+
+        document.getElementById('txtIdRemessa').textContent   = estado.idRemessa;
+        document.getElementById('txtResponsavel').textContent = estado.responsavel;
+        document.getElementById('txtFornecedor').textContent  = estado.fornecedor;
+        document.getElementById('txtNf').textContent          = estado.nf;
+        document.getElementById('txtPedidoCompra').textContent= estado.pedidoCompra;
+        document.getElementById('txtTipoConferencia').textContent = estado.tipoConferencia;
+
+        document.getElementById('boxRemessa').style.display = 'block';
+        document.getElementById('boxContador').style.display = 'block';
+        document.getElementById('txtContador').textContent = '0';
+        document.getElementById('cardItem').classList.remove('oculto');
+
+        ['responsavel','fornecedor','nf','pedidoCompra','tipoConferencia','materialRemessa'].forEach(function(id) {
+          document.getElementById(id).disabled = true;
+        });
+
+        document.getElementById('materialItem').value = estado.material;
+        setMsg('msgRemessa', 'Remessa iniciada: ' + estado.idRemessa, 'ok');
+
+        setTimeout(function() {
+          document.getElementById('cardItem').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 250);
+      })
+      .catch(function(err) {
+        btn.disabled = false; btn.textContent = 'Iniciar remessa';
+        setMsg('msgRemessa', 'Erro: ' + err.message, 'erro');
+      });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // ITEM
+  // ════════════════════════════════════════════════════════
+  async function salvarItem() {
+    if (!estado.idRemessa) { setMsg('msgItem', 'Inicie uma remessa antes de adicionar itens.', 'erro'); return; }
+    if (!getVal('idMaterial')) { setMsg('msgItem', 'Leia o ID Material antes de salvar.', 'erro'); return; }
+    if (estado.tipoConferencia === 'PESAGEM'  && !getVal('pesoInformado'))     { setMsg('msgItem', 'Informe o peso.', 'erro'); return; }
+    if (estado.tipoConferencia === 'METRAGEM' && !getVal('metragemInformada')) { setMsg('msgItem', 'Informe a metragem.', 'erro'); return; }
+    if (estado.tipoConferencia === 'MICRAGEM' && !getVal('micragemInformada')) { setMsg('msgItem', 'Informe a micragem.', 'erro'); return; }
+
+    var btn = document.getElementById('btnSalvarItem');
+    btn.disabled = true; btn.textContent = 'Salvando...';
+
+    try {
+      var fotoMaterial = await arquivoParaBase64('fotoMaterial');
+      var fotoPeso     = await arquivoParaBase64('fotoPeso');
+
+      var payload = {
+        idRemessa: estado.idRemessa, responsavel: estado.responsavel,
+        fornecedor: estado.fornecedor, nf: estado.nf, pedidoCompra: estado.pedidoCompra,
+        tipoConferencia: estado.tipoConferencia, idMaterial: getVal('idMaterial'),
+        material: getVal('materialItem'), lote: getVal('lote'),
+        pesoInformado: getVal('pesoInformado'), metragemInformada: getVal('metragemInformada'),
+        micragemInformada: getVal('micragemInformada'), unidade: getVal('unidade'),
+        condicaoMaterial: getVal('condicaoMaterial'), statusInspecao: getVal('statusInspecao'),
+        observacao: getVal('observacao'), fotoMaterial: fotoMaterial, fotoPeso: fotoPeso,
+        usuarioEmail: usuarioLogado ? usuarioLogado.email : ''
+      };
+
+      chamarAPI('salvarItemRemessa', payload)
+        .then(function(resp) {
+          btn.disabled = false; btn.textContent = 'Salvar conferência';
+          if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Erro ao salvar.', 'erro'); return; }
+
+          estado.itensLancados++;
+          document.getElementById('txtContador').textContent = estado.itensLancados;
+          adicionarHistorico(estado.itensLancados + ' - ID ' + payload.idMaterial + ' | ' + payload.material + ' | ' + obterResumoMedicao(payload));
+
+          limparItem();
+          document.getElementById('materialItem').value = payload.material || estado.material;
+          document.getElementById('unidade').value = payload.unidade;
+          document.getElementById('condicaoMaterial').value = payload.condicaoMaterial;
+          document.getElementById('statusInspecao').value = payload.statusInspecao;
+          setMsg('msgItem', 'Conferência salva. Leia o próximo ID Material ou finalize a remessa.', 'ok');
+        })
+        .catch(function(err) {
+          btn.disabled = false; btn.textContent = 'Salvar conferência';
+          setMsg('msgItem', 'Erro: ' + err.message, 'erro');
+        });
+
+    } catch(err) {
+      btn.disabled = false; btn.textContent = 'Salvar conferência';
+      setMsg('msgItem', err.message, 'erro');
+    }
+  }
+
+  function finalizar() {
+    if (!estado.idRemessa) { setMsg('msgItem', 'Nenhuma remessa iniciada.', 'erro'); return; }
+    if (!confirm('Deseja finalizar a remessa ' + estado.idRemessa + '?')) return;
+
+    var btn = document.getElementById('btnFinalizar');
+    btn.disabled = true; btn.textContent = 'Finalizando...';
+
+    chamarAPI('finalizarRemessa', { idRemessa: estado.idRemessa })
+      .then(function(resp) {
+        btn.disabled = false; btn.textContent = 'Finalizar remessa';
+        if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Erro ao finalizar.', 'erro'); return; }
+
+        document.getElementById('cardResumo').style.display = 'block';
+        document.getElementById('resumoTexto').textContent = 'Remessa ' + resp.idRemessa + ' finalizada com sucesso.';
+        document.getElementById('resTotalItens').textContent = resp.totalItens;
+        document.getElementById('resumoMedidaLabel').textContent = resp.resumoLabel || 'Peso total';
+        document.getElementById('resumoMedidaValor').textContent = formatarNumeroResumo(resp.resumoValor);
+        document.getElementById('resAprovados').textContent = resp.aprovados;
+        document.getElementById('resPendentes').textContent = resp.pendentes + resp.reprovados;
+
+        document.getElementById('btnSalvarItem').disabled = true;
+        document.getElementById('btnFinalizar').disabled = true;
+        document.getElementById('btnNovaConferencia').classList.remove('oculto');
+        setMsg('msgItem', 'Remessa finalizada com sucesso.', 'ok');
+
+        setTimeout(function() {
+          document.getElementById('cardResumo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 250);
+      })
+      .catch(function(err) {
+        btn.disabled = false; btn.textContent = 'Finalizar remessa';
+        setMsg('msgItem', 'Erro: ' + err.message, 'erro');
+      });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // SCANNER — overlay na mesma página (sem iframe, sem popup)
+  // ════════════════════════════════════════════════════════
+  var scannerAtivo = null;
+  var scannerLido  = false;
+
+  function tocarBip() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1046, ctx.currentTime);
+      osc.frequency.setValueAtTime(1318, ctx.currentTime + .07);
+      gain.gain.setValueAtTime(.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .25);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + .25);
+    } catch(e) {}
+  }
+
+  function abrirScanner() {
+    scannerLido = false;
+    var overlay = document.getElementById('scannerOverlay');
+    var statusEl = document.getElementById('scannerStatus');
+    overlay.classList.add('ativo');
+    statusEl.className = 'scanner-status';
+    statusEl.textContent = 'Iniciando câmera...';
+
+    // Limpa reader anterior
+    document.getElementById('scannerReader').innerHTML = '';
+
+    scannerAtivo = new Html5Qrcode('scannerReader');
+
+    Html5Qrcode.getCameras()
+      .then(function(cameras) {
+        if (!cameras || !cameras.length) {
+          statusEl.className = 'scanner-status erro';
+          statusEl.textContent = '❌ Nenhuma câmera encontrada.';
+          return;
+        }
+
+        scannerAtivo.start(
+          { facingMode: 'environment' },
+          {
+            fps: 15,
+            qrbox: function(w, h) {
+              var m = Math.min(w, h);
+              return { width: Math.round(m * .8), height: Math.round(m * .45) };
+            }
+          },
+          onCodigoLido,
+          function() {}
+        )
+        .then(function() {
+          statusEl.textContent = '🔍 Procurando código...';
+        })
+        .catch(function() {
+          // fallback: usa ID direto
+          scannerAtivo.start(
+            cameras[cameras.length - 1].id,
+            { fps: 15, qrbox: function(w,h){ var m=Math.min(w,h); return {width:Math.round(m*.8),height:Math.round(m*.45)}; } },
+            onCodigoLido, function() {}
+          )
+          .then(function() { statusEl.textContent = '🔍 Procurando código...'; })
+          .catch(function(e) {
+            statusEl.className = 'scanner-status erro';
+            statusEl.textContent = '❌ Câmera bloqueada: ' + String(e);
+          });
+        });
+      })
+      .catch(function(e) {
+        statusEl.className = 'scanner-status erro';
+        statusEl.textContent = '❌ Permissão negada: ' + String(e);
+      });
+  }
+
+  function onCodigoLido(txt) {
+    if (scannerLido) return;
+    scannerLido = true;
+
+    var cod = String(txt).replace('Ped:', '').split('|')[0].trim();
+    var statusEl = document.getElementById('scannerStatus');
+    statusEl.className = 'scanner-status ok';
+    statusEl.textContent = '✅ ' + cod;
+
+    tocarBip();
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+
+    if (scannerAtivo) scannerAtivo.stop().catch(function(){});
+
+    setTimeout(function() {
+      fecharScanner();
+      document.getElementById('idMaterial').value = cod;
+
+      var scanStatus = document.getElementById('scanStatus');
+      scanStatus.style.cssText = 'display:block; background:#ecfdf3; color:#027a48; border:1px solid #abefc6; border-radius:12px; padding:10px 13px; font-size:.85rem;';
+      scanStatus.textContent = '✅ Código lido: ' + cod;
+      setMsg('msgItem', 'ID Material lido: ' + cod, 'ok');
+
+      setTimeout(function() { scanStatus.style.display = 'none'; focarCampoPrincipal(); }, 2500);
+    }, 900);
+  }
+
+  function fecharScanner() {
+    document.getElementById('scannerOverlay').classList.remove('ativo');
+    if (scannerAtivo) {
+      scannerAtivo.stop().catch(function(){});
+      scannerAtivo = null;
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // UTILITÁRIOS
+  // ════════════════════════════════════════════════════════
+  function limparItem() {
+    ['idMaterial','lote','pesoInformado','metragemInformada','micragemInformada','observacao'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('fotoMaterial').value = '';
+    document.getElementById('fotoPeso').value = '';
+    var s = document.getElementById('scanStatus');
+    s.style.display = 'none'; s.textContent = '';
+  }
+
+  function adicionarHistorico(texto) {
+    var li = document.createElement('li');
+    li.textContent = texto;
+    document.getElementById('listaItens').prepend(li);
+  }
+
+  function getVal(id) { return String(document.getElementById(id).value || '').trim(); }
+
+  function setMsg(id, texto, tipo) {
+    var el = document.getElementById(id);
+    el.className = 'msg';
+    if (!texto) { el.style.display = 'none'; el.textContent = ''; return; }
+    el.textContent = texto;
+    el.classList.add(tipo === 'erro' ? 'erro' : 'ok');
+  }
+
+  function arquivoParaBase64(inputId) {
+    return new Promise(function(resolve, reject) {
+      var input = document.getElementById(inputId);
+      if (!input.files || !input.files[0]) { resolve(null); return; }
+      var file = input.files[0];
+      if (!file.type.startsWith('image/')) { reject(new Error('Envie apenas imagens.')); return; }
+      comprimirImagem(file, 1400, 0.78).then(resolve).catch(reject);
+    });
+  }
+
+  function comprimirImagem(file, maxWidth, quality) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          var w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          var b64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+          resolve({ base64: b64, mimeType: 'image/jpeg', nome: file.name });
+        };
+        img.onerror = function() { reject(new Error('Não foi possível carregar a imagem.')); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function() { reject(new Error('Não foi possível ler a imagem.')); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function atualizarMateriaisPorTipo() {
+    var tipo = getVal('tipoConferencia');
+    var lista = tipo === 'PESAGEM' ? cadastrosApp.materiaisPesagem :
+                tipo === 'METRAGEM' ? cadastrosApp.materiaisMetragem :
+                tipo === 'MICRAGEM' ? cadastrosApp.materiaisMicragem : [];
+    preencherSelect('materialRemessa', lista);
+    preencherSelect('materialItem', lista);
+    atualizarCamposPorTipo(tipo);
+  }
+
+  function atualizarCamposPorTipo(tipo) {
+    ['campoPeso','campoMetragem','campoMicragem'].forEach(function(id) {
+      document.getElementById(id).classList.add('oculto');
+    });
+    if (tipo === 'PESAGEM')  document.getElementById('campoPeso').classList.remove('oculto');
+    if (tipo === 'METRAGEM') document.getElementById('campoMetragem').classList.remove('oculto');
+    if (tipo === 'MICRAGEM') document.getElementById('campoMicragem').classList.remove('oculto');
+    atualizarRotulosFotos(tipo);
+  }
+
+  function atualizarRotulosFotos(tipo) {
+    var p = document.getElementById('lblFotoPrincipal');
+    var s = document.getElementById('lblFotoSecundaria');
+    if (tipo === 'METRAGEM') { p.textContent = 'Medida'; s.textContent = 'Foto complementar da medida'; return; }
+    if (tipo === 'MICRAGEM') { p.textContent = 'Micras'; s.textContent = 'Foto complementar das micras'; return; }
+    p.textContent = 'Foto material + peso'; s.textContent = 'Foto somente do peso';
+  }
+
+  function obterResumoMedicao(payload) {
+    if (payload.tipoConferencia === 'PESAGEM')  return 'Peso: '     + payload.pesoInformado     + ' ' + payload.unidade;
+    if (payload.tipoConferencia === 'METRAGEM') return 'Metragem: ' + payload.metragemInformada + ' ' + payload.unidade;
+    if (payload.tipoConferencia === 'MICRAGEM') return 'Micragem: ' + payload.micragemInformada + ' ' + payload.unidade;
+    return payload.tipoConferencia || 'Conferência';
+  }
+
+  function focarCampoPrincipal() {
+    var mapa = { PESAGEM: 'pesoInformado', METRAGEM: 'metragemInformada', MICRAGEM: 'micragemInformada' };
+    var id = mapa[estado.tipoConferencia] || 'observacao';
+    document.getElementById(id).focus();
+  }
+
+  function formatarDecimalVirgula(el) {
+    var v = el.value.replace(/\./g,',').replace(/[^\d,]/g,'');
+    var p = v.split(',');
+    el.value = p.length > 2 ? p[0] + ',' + p.slice(1).join('') : v;
+  }
+
+  function formatarNumeroResumo(valor) {
+    if (valor === null || valor === undefined || valor === '') return '0';
+    return String(valor).replace('.', ',');
+  }
+
+  function iniciarNovaConferencia() { window.location.reload(); }
+</script>
+</body>
+</html>
