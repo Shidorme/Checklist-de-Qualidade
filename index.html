@@ -497,45 +497,57 @@
     var btn   = document.getElementById('btnLogin');
 
     msgEl.style.display = 'none';
+    msgEl.textContent = '';
 
     if (!empresaAtual) {
       msgEl.textContent = 'Selecione a empresa antes de entrar.';
-      msgEl.style.display = 'block'; return;
+      msgEl.style.display = 'block';
+      return;
     }
 
     if (!email || !senha) {
       msgEl.textContent = 'Preencha e-mail e senha.';
-      msgEl.style.display = 'block'; return;
+      msgEl.style.display = 'block';
+      return;
     }
 
     var dominio = empresaConfig[empresaAtual] ? empresaConfig[empresaAtual].dominio : DOMINIO_PERMITIDO;
-    if (!email.endsWith('@' + dominio)) {
+    if (!email.toLowerCase().endsWith('@' + dominio.toLowerCase())) {
       msgEl.textContent = 'Acesso permitido apenas para e-mails @' + dominio + '.';
-      msgEl.style.display = 'block'; return;
+      msgEl.style.display = 'block';
+      return;
     }
 
     btn.disabled = true;
     btn.textContent = 'Verificando...';
 
-    // Valida credenciais no backend
-    chamarAPI('login', { email: email, senha: senha })
+    // Valida credenciais no Apps Script usando a aba USUARIOS
+    chamarAPI('login', {
+      empresa: empresaAtual,
+      email: email,
+      senha: senha
+    })
       .then(function(resp) {
         btn.disabled = false;
         btn.textContent = 'Entrar';
-        if (resp.ok) {
-          usuarioLogado = { email: email };
-          sessionStorage.setItem('usuario', email);
-      sessionStorage.setItem('empresa', empresaAtual);
+
+        if (resp && resp.ok) {
+          usuarioLogado = resp.usuario || { email: email, empresa: empresaAtual };
+
+          sessionStorage.setItem('usuario', JSON.stringify(usuarioLogado));
+          sessionStorage.setItem('empresa', empresaAtual);
+
           mostrarApp();
-        } else {
-          msgEl.textContent = resp.mensagem || 'E-mail ou senha incorretos.';
-          msgEl.style.display = 'block';
+          return;
         }
+
+        msgEl.textContent = (resp && resp.mensagem) ? resp.mensagem : 'E-mail ou senha incorretos.';
+        msgEl.style.display = 'block';
       })
       .catch(function(err) {
         btn.disabled = false;
         btn.textContent = 'Entrar';
-        msgEl.textContent = 'Erro de conexão. Tente novamente.';
+        msgEl.textContent = 'Erro de conexão. Tente novamente. Detalhe: ' + (err.message || err);
         msgEl.style.display = 'block';
       });
   }
@@ -555,11 +567,21 @@
 
   // Verifica sessão ao carregar
   window.addEventListener('DOMContentLoaded', function() {
-    var email = sessionStorage.getItem('usuario');
+    var usuarioSalvo = sessionStorage.getItem('usuario');
     var empresa = sessionStorage.getItem('empresa');
-    if (email && empresa) {
-      usuarioLogado = { email: email };
+
+    if (usuarioSalvo && empresa) {
+      try {
+        usuarioLogado = JSON.parse(usuarioSalvo);
+      } catch(e) {
+        usuarioLogado = { email: usuarioSalvo };
+      }
+
       empresaAtual = empresa;
+
+      var selectEmpresa = document.getElementById('loginEmpresa');
+      if (selectEmpresa) selectEmpresa.value = empresaAtual;
+
       mostrarApp();
     }
 
