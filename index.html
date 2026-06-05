@@ -105,6 +105,15 @@
       padding: 6px 10px; cursor: pointer; min-height: unset; width: auto; margin-top: 4px;
     }
 
+    .usuario-logado-box {
+      margin-top: 8px;
+      font-size: .72rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .88);
+      letter-spacing: .3px;
+      line-height: 1.3;
+    }
+        
     /* Logo empresa no login */
     .login-logo-empresa {
       width: 120px; height: 80px; display: flex; align-items: center; justify-content: center;
@@ -326,7 +335,12 @@
           <span class="tag" id="tagEmpresaApp">Geo System Qualidade</span>
           <h1>Checklist de Qualidade</h1>
           <p>Recebimento de material com conferência, evidência fotográfica e rastreio por remessa.</p>
+        
+          <div id="usuarioLogadoBox" class="usuario-logado-box">
+            Usuário não identificado
+          </div>
         </div>
+        
         <button class="btn-sair" onclick="sair()">Sair</button>
       </div>
     </div>
@@ -556,15 +570,37 @@
     document.getElementById('telaLogin').style.display = 'none';
     document.getElementById('telaApp').style.display = 'block';
     aplicarEmpresaNoApp();
+    atualizarUsuarioLogadoNaTela();
     carregarApp();
+  }
+  
+  function atualizarUsuarioLogadoNaTela() {
+    var box = document.getElementById('usuarioLogadoBox');
+  
+    if (!box) return;
+  
+    if (!usuarioLogado) {
+      box.textContent = 'Usuário não identificado';
+      return;
+    }
+  
+    var nome = usuarioLogado.nome || usuarioLogado.email || 'USUÁRIO';
+    var perfil = usuarioLogado.perfil || '';
+    var setor = usuarioLogado.setor || '';
+    var empresa = usuarioLogado.empresa || empresaAtual || '';
+  
+    box.textContent = nome + ' | ' + perfil + ' | ' + setor + ' | ' + empresa;
   }
 
   function sair() {
     sessionStorage.removeItem('usuario');
+    sessionStorage.removeItem('empresa');
+  
     usuarioLogado = null;
+    empresaAtual = '';
+  
     window.location.reload();
   }
-
   // Verifica sessão ao carregar
   window.addEventListener('DOMContentLoaded', function() {
     var usuarioSalvo = sessionStorage.getItem('usuario');
