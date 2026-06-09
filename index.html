@@ -815,6 +815,71 @@
     box.textContent = nome + ' | ' + perfil + ' | ' + setor + ' | ' + empresa;
   }
 
+  function abrirModulo(modulo) {
+    var portalHome = document.getElementById('portalHome');
+    var moduloChecklist = document.getElementById('moduloChecklist');
+    var tituloModuloApp = document.getElementById('tituloModuloApp');
+    var descricaoModuloApp = document.getElementById('descricaoModuloApp');
+  
+    if (modulo === 'checklist') {
+      if (portalHome) {
+        portalHome.style.display = 'none';
+      }
+  
+      if (moduloChecklist) {
+        moduloChecklist.classList.add('ativo');
+        moduloChecklist.style.display = 'block';
+      } else {
+        alert('Erro: área do Checklist não encontrada no HTML.');
+        return;
+      }
+  
+      if (tituloModuloApp) {
+        tituloModuloApp.textContent = 'Checklist de Qualidade';
+      }
+  
+      if (descricaoModuloApp) {
+        descricaoModuloApp.textContent = 'Recebimento de material, fotos, conferência e rastreio por remessa.';
+      }
+  
+      carregarApp();
+      window.scrollTo(0, 0);
+      return;
+    }
+  
+    moduloEmBreve(modulo);
+  }
+  
+  function voltarPortal() {
+    var portalHome = document.getElementById('portalHome');
+    var moduloChecklist = document.getElementById('moduloChecklist');
+    var tituloModuloApp = document.getElementById('tituloModuloApp');
+    var descricaoModuloApp = document.getElementById('descricaoModuloApp');
+  
+    if (moduloChecklist) {
+      moduloChecklist.classList.remove('ativo');
+      moduloChecklist.style.display = 'none';
+    }
+  
+    if (portalHome) {
+      portalHome.style.display = 'block';
+    }
+  
+    if (tituloModuloApp) {
+      tituloModuloApp.textContent = 'Portal Central GeoSystem';
+    }
+  
+    if (descricaoModuloApp) {
+      descricaoModuloApp.textContent = 'Central de módulos operacionais para logística, expedição e qualidade.';
+    }
+  
+    window.scrollTo(0, 0);
+  }
+  
+  function moduloEmBreve(nomeModulo) {
+    alert(nomeModulo + ' será liberado em uma próxima etapa.');
+  }
+  
   function sair() {
     sessionStorage.removeItem('usuario');
     sessionStorage.removeItem('empresa');
