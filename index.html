@@ -754,6 +754,48 @@
     atualizarUsuarioLogadoNaTela();
     carregarApp();
   }
+
+  function abrirModulo(modulo) {
+    if (modulo === 'checklist') {
+      var portal = document.getElementById('portalHome');
+      var checklist = document.getElementById('moduloChecklist');
+  
+      if (portal) {
+        portal.style.display = 'none';
+      }
+  
+      if (checklist) {
+        checklist.classList.add('ativo');
+        checklist.style.display = 'block';
+        carregarApp();
+      }
+  
+      window.scrollTo(0, 0);
+      return;
+    }
+  
+    moduloEmBreve(modulo);
+  }
+  
+  function voltarPortal() {
+    var portal = document.getElementById('portalHome');
+    var checklist = document.getElementById('moduloChecklist');
+  
+    if (checklist) {
+      checklist.classList.remove('ativo');
+      checklist.style.display = 'none';
+    }
+  
+    if (portal) {
+      portal.style.display = 'block';
+    }
+  
+    window.scrollTo(0, 0);
+  }
+  
+  function moduloEmBreve(nomeModulo) {
+    alert(nomeModulo + ' será liberado em uma próxima etapa.');
+  }
   
   function atualizarUsuarioLogadoNaTela() {
     var box = document.getElementById('usuarioLogadoBox');
