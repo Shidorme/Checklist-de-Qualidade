@@ -234,7 +234,122 @@
     .mini-card strong { display: block; margin-top: 5px; font-size: 1.15rem; color: var(--verde-escuro); }
 
     .oculto { display: none !important; }
-
+    
+    /* ── PORTAL CENTRAL / MENU DE MÓDULOS ── */
+    .portal-home {
+      display: block;
+    }
+    
+    .portal-boas-vindas {
+      background: white;
+      border: 1px solid #e7ecea;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 5px 18px rgba(16,24,40,.08);
+    }
+    
+    .portal-boas-vindas h2 {
+      margin: 0 0 8px;
+      color: var(--verde-escuro);
+      font-size: 1.18rem;
+      line-height: 1.25;
+    }
+    
+    .portal-boas-vindas p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.4;
+    }
+    
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    .modulo-card {
+      width: 100%;
+      border: 1px solid #e7ecea;
+      border-radius: 20px;
+      padding: 16px;
+      background: white;
+      box-shadow: 0 5px 18px rgba(16,24,40,.08);
+      text-align: left;
+      cursor: pointer;
+      min-height: 118px;
+    }
+    
+    .modulo-card:active {
+      transform: scale(.99);
+    }
+    
+    .modulo-card .modulo-icone {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--verde-claro);
+      color: var(--verde-escuro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+    
+    .modulo-card h3 {
+      margin: 0 0 6px;
+      color: var(--verde-escuro);
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+    
+    .modulo-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.35;
+      font-weight: 500;
+    }
+    
+    .modulo-card.desabilitado {
+      opacity: .55;
+      cursor: not-allowed;
+      background: #f9fafb;
+    }
+    
+    .modulo-card.desabilitado .modulo-icone {
+      background: #eef1f0;
+      color: #667085;
+    }
+    
+    .area-modulo {
+      display: none;
+    }
+    
+    .area-modulo.ativo {
+      display: block;
+    }
+    
+    .btn-voltar-portal {
+      width: auto;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #eef1f0;
+      color: #344054;
+      font-size: .82rem;
+      margin-bottom: 12px;
+    }
+    
+    @media (min-width: 700px) {
+      .portal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    
     /* ── SCANNER OVERLAY ── */
     #scannerOverlay {
       display: none; position: fixed; inset: 0; z-index: 100;
@@ -333,8 +448,8 @@
         </div>
         <div style="flex:1;margin-left:10px;">
           <span class="tag" id="tagEmpresaApp">Geo System Qualidade</span>
-          <h1>Checklist de Qualidade</h1>
-          <p>Recebimento de material com conferência, evidência fotográfica e rastreio por remessa.</p>
+            <h1 id="tituloModuloApp">Portal Central GeoSystem</h1>
+            <p id="descricaoModuloApp">Central de módulos operacionais para logística, expedição e qualidade.</p>
         
           <div id="usuarioLogadoBox" class="usuario-logado-box">
             Usuário não identificado
@@ -345,6 +460,68 @@
       </div>
     </div>
 
+    <!-- ══════════ HOME DO PORTAL CENTRAL ══════════ -->
+    <div id="portalHome" class="portal-home">
+      <div class="portal-boas-vindas">
+        <h2>Portal Central GeoSystem</h2>
+        <p>Escolha abaixo o módulo que deseja acessar. Nesta etapa, vamos centralizar os módulos sem alterar a lógica que já funciona no Checklist.</p>
+      </div>
+    
+      <div class="portal-grid">
+        <button class="modulo-card" onclick="abrirModulo('checklist')">
+          <div class="modulo-icone">✓</div>
+          <h3>Checklist de Qualidade</h3>
+          <p>Recebimento de material, fotos, conferência e rastreio por remessa.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Cadastro de Motoristas')">
+          <div class="modulo-icone">M</div>
+          <h3>Cadastro de Motoristas</h3>
+          <p>Base de motoristas para programação e coletas.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Cadastro de Veículos')">
+          <div class="modulo-icone">V</div>
+          <h3>Cadastro de Veículos</h3>
+          <p>Cadastro de placas, tipo de veículo e vínculo com transportadora.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Cadastro de Transportadoras')">
+          <div class="modulo-icone">T</div>
+          <h3>Cadastro de Transportadoras</h3>
+          <p>Base de transportadoras para logística e expedição.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Programação')">
+          <div class="modulo-icone">P</div>
+          <h3>Programação</h3>
+          <p>Pedidos, ordens de coleta, motorista, placa e status operacional.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Consulta de Programação')">
+          <div class="modulo-icone">C</div>
+          <h3>Consulta de Programação</h3>
+          <p>Consulta rápida de coletas programadas e andamento da expedição.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Coletas / Carregamento')">
+          <div class="modulo-icone">L</div>
+          <h3>Coletas / Carregamento</h3>
+          <p>Início de coleta, conferência do motorista, bipes e fotos da carga.</p>
+        </button>
+    
+        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Ocorrências')">
+          <div class="modulo-icone">!</div>
+          <h3>Ocorrências</h3>
+          <p>Registro de problemas e retorno da programação para logística.</p>
+        </button>
+      </div>
+    </div>
+    
+    <!-- ══════════ ÁREA DO MÓDULO CHECKLIST ══════════ -->
+    <div id="moduloChecklist" class="area-modulo">
+      <button class="btn-voltar-portal" onclick="voltarPortal()">← Voltar ao Portal</button>
+    
     <div class="card" id="cardRemessa">
       <h2><span class="step">1</span> Dados da remessa</h2>
       <div class="grid">
@@ -438,6 +615,10 @@
         <div class="mini-card"><span>Pend./Reprov.</span><strong id="resPendentes">0</strong></div>
       </div>
     </div>
+
+    <!-- fecha moduloChecklist -->
+    </div>
+
   </div>
 </div>
 
