@@ -474,7 +474,7 @@
           <p>Recebimento de material, fotos, conferência e rastreio por remessa.</p>
         </button>
     
-        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Cadastro de Motoristas')">
+        <button class="modulo-card" onclick="abrirModulo('motoristas')">
           <div class="modulo-icone">M</div>
           <h3>Cadastro de Motoristas</h3>
           <p>Base de motoristas para programação e coletas.</p>
@@ -517,6 +517,74 @@
         </button>
       </div>
     </div>
+
+    <!-- ══════════ ÁREA DO MÓDULO MOTORISTAS ══════════ -->
+    <div id="moduloMotoristas" class="area-modulo">
+      <button class="btn-voltar-portal" onclick="voltarPortal()">← Voltar ao Portal</button>
+    
+      <div class="card">
+        <h2><span class="step">M</span> Cadastro de Motoristas</h2>
+    
+        <div class="grid">
+          <div class="campo full">
+            <label>Nome do motorista</label>
+            <input type="text" id="motNome" placeholder="Ex.: João da Silva">
+          </div>
+    
+          <div class="campo">
+            <label>CPF</label>
+            <input type="text" id="motCpf" placeholder="000.000.000-00">
+          </div>
+    
+          <div class="campo">
+            <label>RG</label>
+            <input type="text" id="motRg" placeholder="RG do motorista">
+          </div>
+    
+          <div class="campo">
+            <label>CNH</label>
+            <input type="text" id="motCnh" placeholder="Número da CNH">
+          </div>
+    
+          <div class="campo">
+            <label>Telefone</label>
+            <input type="text" id="motTelefone" placeholder="(11) 99999-9999">
+          </div>
+    
+          <div class="campo full">
+            <label>Transportadora</label>
+            <input type="text" id="motTransportadora" placeholder="Nome da transportadora">
+          </div>
+    
+          <div class="campo">
+            <label>Status</label>
+            <select id="motStatus">
+              <option value="ATIVO">ATIVO</option>
+              <option value="INATIVO">INATIVO</option>
+            </select>
+          </div>
+    
+          <div class="campo full">
+            <label>Observação</label>
+            <textarea id="motObservacao" placeholder="Observações gerais sobre o motorista"></textarea>
+          </div>
+        </div>
+    
+        <div class="acoes">
+          <button class="btn-principal" onclick="salvarMotoristaPortalFront()">Salvar motorista</button>
+          <button class="btn-limpar" onclick="limparFormularioMotorista()">Limpar</button>
+        </div>
+    
+        <div id="msgMotorista" class="msg"></div>
+      </div>
+    
+      <div class="card">
+        <h2><span class="step">L</span> Motoristas cadastrados</h2>
+        <div id="listaMotoristasPortal" class="historico">
+          Carregando motoristas...
+        </div>
+      </div>
+    </div>    
     
     <!-- ══════════ ÁREA DO MÓDULO CHECKLIST ══════════ -->
     <div id="moduloChecklist" class="area-modulo">
@@ -775,6 +843,43 @@
     }
   
     moduloEmBreve(modulo);
+
+    if (modulo === 'motoristas') {
+    var portalHome = document.getElementById('portalHome');
+    var moduloMotoristas = document.getElementById('moduloMotoristas');
+    var moduloChecklist = document.getElementById('moduloChecklist');
+    var tituloModuloApp = document.getElementById('tituloModuloApp');
+    var descricaoModuloApp = document.getElementById('descricaoModuloApp');
+
+    if (portalHome) {
+      portalHome.style.display = 'none';
+    }
+
+    if (moduloChecklist) {
+      moduloChecklist.classList.remove('ativo');
+      moduloChecklist.style.display = 'none';
+    }
+
+    if (moduloMotoristas) {
+      moduloMotoristas.classList.add('ativo');
+      moduloMotoristas.style.display = 'block';
+    } else {
+      alert('Erro: área de Motoristas não encontrada no HTML.');
+      return;
+    }
+
+    if (tituloModuloApp) {
+      tituloModuloApp.textContent = 'Cadastro de Motoristas';
+    }
+
+    if (descricaoModuloApp) {
+      descricaoModuloApp.textContent = 'Cadastro, consulta e controle de motoristas para programação e coletas.';
+    }
+
+    listarMotoristasPortalFront();
+    window.scrollTo(0, 0);
+    return;
+    }
   }
   
   function voltarPortal() {
@@ -818,14 +923,25 @@
   function abrirModulo(modulo) {
     var portalHome = document.getElementById('portalHome');
     var moduloChecklist = document.getElementById('moduloChecklist');
+    var moduloMotoristas = document.getElementById('moduloMotoristas');
     var tituloModuloApp = document.getElementById('tituloModuloApp');
     var descricaoModuloApp = document.getElementById('descricaoModuloApp');
   
-    if (modulo === 'checklist') {
-      if (portalHome) {
-        portalHome.style.display = 'none';
-      }
+    if (portalHome) {
+      portalHome.style.display = 'none';
+    }
   
+    if (moduloChecklist) {
+      moduloChecklist.classList.remove('ativo');
+      moduloChecklist.style.display = 'none';
+    }
+  
+    if (moduloMotoristas) {
+      moduloMotoristas.classList.remove('ativo');
+      moduloMotoristas.style.display = 'none';
+    }
+  
+    if (modulo === 'checklist') {
       if (moduloChecklist) {
         moduloChecklist.classList.add('ativo');
         moduloChecklist.style.display = 'block';
@@ -847,18 +963,46 @@
       return;
     }
   
+    if (modulo === 'motoristas') {
+      if (moduloMotoristas) {
+        moduloMotoristas.classList.add('ativo');
+        moduloMotoristas.style.display = 'block';
+      } else {
+        alert('Erro: área de Motoristas não encontrada no HTML.');
+        return;
+      }
+  
+      if (tituloModuloApp) {
+        tituloModuloApp.textContent = 'Cadastro de Motoristas';
+      }
+  
+      if (descricaoModuloApp) {
+        descricaoModuloApp.textContent = 'Cadastro, consulta e controle de motoristas para programação e coletas.';
+      }
+  
+      listarMotoristasPortalFront();
+      window.scrollTo(0, 0);
+      return;
+    }
+  
     moduloEmBreve(modulo);
   }
   
   function voltarPortal() {
     var portalHome = document.getElementById('portalHome');
     var moduloChecklist = document.getElementById('moduloChecklist');
+    var moduloMotoristas = document.getElementById('moduloMotoristas');
     var tituloModuloApp = document.getElementById('tituloModuloApp');
     var descricaoModuloApp = document.getElementById('descricaoModuloApp');
   
     if (moduloChecklist) {
       moduloChecklist.classList.remove('ativo');
       moduloChecklist.style.display = 'none';
+    }
+  
+    if (moduloMotoristas) {
+      moduloMotoristas.classList.remove('ativo');
+      moduloMotoristas.style.display = 'none';
     }
   
     if (portalHome) {
@@ -1373,6 +1517,112 @@
   }
 
   function iniciarNovaConferencia() { window.location.reload(); }
+  
+  function salvarMotoristaPortalFront() {
+    var msg = document.getElementById('msgMotorista');
+  
+    if (msg) {
+      msg.className = 'msg';
+      msg.textContent = '';
+      msg.style.display = 'none';
+    }
+  
+    var dados = {
+      nome: document.getElementById('motNome').value,
+      cpf: document.getElementById('motCpf').value,
+      rg: document.getElementById('motRg').value,
+      cnh: document.getElementById('motCnh').value,
+      telefone: document.getElementById('motTelefone').value,
+      transportadora: document.getElementById('motTransportadora').value,
+      status: document.getElementById('motStatus').value,
+      observacao: document.getElementById('motObservacao').value
+    };
+  
+    chamarAPI('salvarMotoristaPortal', dados)
+      .then(function(resp) {
+        if (resp && resp.ok) {
+          if (msg) {
+            msg.className = 'msg ok';
+            msg.textContent = resp.mensagem + ' ID: ' + resp.idMotorista;
+            msg.style.display = 'block';
+          }
+  
+          limparFormularioMotorista();
+          listarMotoristasPortalFront();
+          return;
+        }
+  
+        if (msg) {
+          msg.className = 'msg erro';
+          msg.textContent = (resp && resp.mensagem) ? resp.mensagem : 'Erro ao salvar motorista.';
+          msg.style.display = 'block';
+        }
+      })
+      .catch(function(err) {
+        if (msg) {
+          msg.className = 'msg erro';
+          msg.textContent = 'Erro de comunicação: ' + err.message;
+          msg.style.display = 'block';
+        }
+      });
+  }
+  
+  function listarMotoristasPortalFront() {
+    var box = document.getElementById('listaMotoristasPortal');
+  
+    if (box) {
+      box.innerHTML = 'Carregando motoristas...';
+    }
+  
+    chamarAPI('listarMotoristasPortal', {})
+      .then(function(resp) {
+        if (!box) return;
+  
+        if (!resp || !resp.ok) {
+          box.innerHTML = 'Erro ao carregar motoristas.';
+          return;
+        }
+  
+        if (!resp.motoristas || resp.motoristas.length === 0) {
+          box.innerHTML = 'Nenhum motorista cadastrado.';
+          return;
+        }
+  
+        var html = '<ul>';
+  
+        resp.motoristas.forEach(function(m) {
+          html += '<li>';
+          html += '<strong>' + (m.nome || '-') + '</strong><br>';
+          html += 'CPF: ' + (m.cpf || '-') + ' | ';
+          html += 'CNH: ' + (m.cnh || '-') + '<br>';
+          html += 'Transportadora: ' + (m.transportadora || '-') + '<br>';
+          html += 'Status: ' + (m.status || '-') + '<br>';
+          html += '<small>ID: ' + (m.idMotorista || '-') + '</small>';
+          html += '</li>';
+        });
+  
+        html += '</ul>';
+  
+        box.innerHTML = html;
+      })
+      .catch(function(err) {
+        if (box) {
+          box.innerHTML = 'Erro de comunicação: ' + err.message;
+        }
+      });
+  }
+  
+  function limparFormularioMotorista() {
+    document.getElementById('motNome').value = '';
+    document.getElementById('motCpf').value = '';
+    document.getElementById('motRg').value = '';
+    document.getElementById('motCnh').value = '';
+    document.getElementById('motTelefone').value = '';
+    document.getElementById('motTransportadora').value = '';
+    document.getElementById('motStatus').value = 'ATIVO';
+    document.getElementById('motObservacao').value = '';
+  }
+  
 </script>
 </body>
 </html>
