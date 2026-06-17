@@ -234,6 +234,24 @@
     .mini-card strong { display: block; margin-top: 5px; font-size: 1.15rem; color: var(--verde-escuro); }
 
     .oculto { display: none !important; }
+    .foto-cnh-preview {
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #e7ecea;
+      border-radius: 14px;
+      background: #f9fafb;
+      font-size: .78rem;
+      color: #344054;
+      line-height: 1.35;
+    }
+    
+    .foto-cnh-preview.ok {
+      display: block;
+      background: #ecfdf3;
+      color: #027a48;
+      border-color: #abefc6;
+    }
     
     /* ── PORTAL CENTRAL / MENU DE MÓDULOS ── */
     .portal-home {
@@ -528,34 +546,34 @@
         <div class="grid">
           <div class="campo full">
             <label>Nome do motorista</label>
-            <input type="text" id="motNome" placeholder="Ex.: João da Silva">
+            <input type="text" id="motNome" maxlength="80" placeholder="Ex.: JOÃO DA SILVA" oninput="this.value = this.value.toUpperCase()">
           </div>
-    
+          
           <div class="campo">
             <label>CPF</label>
-            <input type="text" id="motCpf" placeholder="000.000.000-00">
+            <input type="text" id="motCpf" maxlength="14" inputmode="numeric" placeholder="Ex.: 000.000.000-00" oninput="mascaraCpfCampo(this)">
           </div>
-    
+          
           <div class="campo">
             <label>RG</label>
-            <input type="text" id="motRg" placeholder="RG do motorista">
+            <input type="text" id="motRg" maxlength="20" placeholder="Ex.: 12.345.678-9" oninput="this.value = this.value.toUpperCase()">
           </div>
-    
+          
           <div class="campo">
             <label>CNH</label>
-            <input type="text" id="motCnh" placeholder="Número da CNH">
+            <input type="text" id="motCnh" maxlength="11" inputmode="numeric" placeholder="Ex.: 12345678900" oninput="somenteNumerosCampo(this, 11)">
           </div>
-    
+          
           <div class="campo">
             <label>Telefone</label>
-            <input type="text" id="motTelefone" placeholder="(11) 99999-9999">
+            <input type="text" id="motTelefone" maxlength="15" inputmode="numeric" placeholder="Ex.: (11) 99999-9999" oninput="mascaraTelefoneCampo(this)">
           </div>
-    
+          
           <div class="campo full">
             <label>Transportadora</label>
-            <input type="text" id="motTransportadora" placeholder="Nome da transportadora">
+            <input type="text" id="motTransportadora" maxlength="80" placeholder="Ex.: HUGO TRANSPORTES" oninput="this.value = this.value.toUpperCase()">
           </div>
-    
+          
           <div class="campo">
             <label>Status</label>
             <select id="motStatus">
@@ -563,10 +581,19 @@
               <option value="INATIVO">INATIVO</option>
             </select>
           </div>
-    
+          
+          <div class="campo full">
+            <label>Foto da CNH</label>
+            <input type="file" id="motFotoCnh" accept="image/*" capture="environment" onchange="prepararFotoCnhMotorista(this)">
+            <small style="font-size:.72rem;color:#667085;line-height:1.35;">
+              Tire ou anexe uma foto legível da CNH do motorista. A imagem será salva no Drive.
+            </small>
+            <div id="previewFotoCnh" class="foto-cnh-preview"></div>
+          </div>
+          
           <div class="campo full">
             <label>Observação</label>
-            <textarea id="motObservacao" placeholder="Observações gerais sobre o motorista"></textarea>
+            <textarea id="motObservacao" maxlength="250" placeholder="Ex.: Motorista fixo / agregado / autorizado pela logística"></textarea>
           </div>
         </div>
     
@@ -821,81 +848,6 @@
     aplicarEmpresaNoApp();
     atualizarUsuarioLogadoNaTela();
     carregarApp();
-  }
-
-  function abrirModulo(modulo) {
-    if (modulo === 'checklist') {
-      var portal = document.getElementById('portalHome');
-      var checklist = document.getElementById('moduloChecklist');
-  
-      if (portal) {
-        portal.style.display = 'none';
-      }
-  
-      if (checklist) {
-        checklist.classList.add('ativo');
-        checklist.style.display = 'block';
-        carregarApp();
-      }
-  
-      window.scrollTo(0, 0);
-      return;
-    }
-  
-    moduloEmBreve(modulo);
-
-    if (modulo === 'motoristas') {
-    var portalHome = document.getElementById('portalHome');
-    var moduloMotoristas = document.getElementById('moduloMotoristas');
-    var moduloChecklist = document.getElementById('moduloChecklist');
-    var tituloModuloApp = document.getElementById('tituloModuloApp');
-    var descricaoModuloApp = document.getElementById('descricaoModuloApp');
-
-    if (portalHome) {
-      portalHome.style.display = 'none';
-    }
-
-    if (moduloChecklist) {
-      moduloChecklist.classList.remove('ativo');
-      moduloChecklist.style.display = 'none';
-    }
-
-    if (moduloMotoristas) {
-      moduloMotoristas.classList.add('ativo');
-      moduloMotoristas.style.display = 'block';
-    } else {
-      alert('Erro: área de Motoristas não encontrada no HTML.');
-      return;
-    }
-
-    if (tituloModuloApp) {
-      tituloModuloApp.textContent = 'Cadastro de Motoristas';
-    }
-
-    if (descricaoModuloApp) {
-      descricaoModuloApp.textContent = 'Cadastro, consulta e controle de motoristas para programação e coletas.';
-    }
-
-    listarMotoristasPortalFront();
-    window.scrollTo(0, 0);
-    return;
-    }
-  }
-  
-  function voltarPortal() {
-    var portal = document.getElementById('portalHome');
-    var checklist = document.getElementById('moduloChecklist');
-  
-    if (checklist) {
-      checklist.classList.remove('ativo');
-      checklist.style.display = 'none';
-    }
-  
-    if (portal) {
-      portal.style.display = 'block';
-    }
-  
-    window.scrollTo(0, 0);
   }
   
   function moduloEmBreve(nomeModulo) {
@@ -1529,13 +1481,14 @@
   
     var dados = {
       nome: document.getElementById('motNome').value,
-      cpf: document.getElementById('motCpf').value,
+      cpf: somenteNumeros(document.getElementById('motCpf').value),
       rg: document.getElementById('motRg').value,
-      cnh: document.getElementById('motCnh').value,
-      telefone: document.getElementById('motTelefone').value,
+      cnh: somenteNumeros(document.getElementById('motCnh').value),
+      telefone: somenteNumeros(document.getElementById('motTelefone').value),
       transportadora: document.getElementById('motTransportadora').value,
       status: document.getElementById('motStatus').value,
-      observacao: document.getElementById('motObservacao').value
+      observacao: document.getElementById('motObservacao').value,
+      fotoCnh: fotoCnhMotoristaAtual
     };
   
     chamarAPI('salvarMotoristaPortal', dados)
@@ -1593,10 +1546,16 @@
         resp.motoristas.forEach(function(m) {
           html += '<li>';
           html += '<strong>' + (m.nome || '-') + '</strong><br>';
-          html += 'CPF: ' + (m.cpf || '-') + ' | ';
+          html += 'CPF: ' + formatarCpfTexto(m.cpf) + ' | ';
           html += 'CNH: ' + (m.cnh || '-') + '<br>';
+          html += 'Telefone: ' + formatarTelefoneTexto(m.telefone) + '<br>';
           html += 'Transportadora: ' + (m.transportadora || '-') + '<br>';
           html += 'Status: ' + (m.status || '-') + '<br>';
+          
+          if (m.linkFotoCnh) {
+            html += '<a href="' + m.linkFotoCnh + '" target="_blank">Abrir foto da CNH</a><br>';
+          }
+          
           html += '<small>ID: ' + (m.idMotorista || '-') + '</small>';
           html += '</li>';
         });
@@ -1621,7 +1580,175 @@
     document.getElementById('motTransportadora').value = '';
     document.getElementById('motStatus').value = 'ATIVO';
     document.getElementById('motObservacao').value = '';
+    fotoCnhMotoristaAtual = null;
+    
+    var inputFoto = document.getElementById('motFotoCnh');
+    if (inputFoto) inputFoto.value = '';
+    
+    var preview = document.getElementById('previewFotoCnh');
+    if (preview) {
+      preview.className = 'foto-cnh-preview';
+      preview.textContent = '';
+    }
   }
+
+  var fotoCnhMotoristaAtual = null;
+
+function somenteNumeros(valor) {
+  return String(valor || '').replace(/\D/g, '');
+}
+
+function somenteNumerosCampo(campo, limite) {
+  campo.value = somenteNumeros(campo.value).substring(0, limite || 999);
+}
+
+function mascaraCpfCampo(campo) {
+  var valor = somenteNumeros(campo.value).substring(0, 11);
+
+  if (valor.length > 9) {
+    valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, '$1.$2.$3-$4');
+  } else if (valor.length > 6) {
+    valor = valor.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+  } else if (valor.length > 3) {
+    valor = valor.replace(/^(\d{3})(\d{0,3}).*/, '$1.$2');
+  }
+
+  campo.value = valor;
+}
+
+function mascaraTelefoneCampo(campo) {
+  var valor = somenteNumeros(campo.value).substring(0, 11);
+
+  if (valor.length > 10) {
+    valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+  } else if (valor.length > 6) {
+    valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+  } else if (valor.length > 2) {
+    valor = valor.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+  }
+
+  campo.value = valor;
+}
+
+function formatarCpfTexto(valor) {
+  var cpf = somenteNumeros(valor).substring(0, 11);
+
+  if (cpf.length !== 11) return valor || '-';
+
+  return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+}
+
+function formatarTelefoneTexto(valor) {
+  var tel = somenteNumeros(valor);
+
+  if (tel.length === 11) {
+    return tel.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  }
+
+  if (tel.length === 10) {
+    return tel.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+  }
+
+  return valor || '-';
+}
+
+function prepararFotoCnhMotorista(input) {
+  var preview = document.getElementById('previewFotoCnh');
+  fotoCnhMotoristaAtual = null;
+
+  if (preview) {
+    preview.className = 'foto-cnh-preview';
+    preview.textContent = '';
+  }
+
+  if (!input.files || !input.files[0]) {
+    return;
+  }
+
+  var arquivo = input.files[0];
+
+  if (!arquivo.type || arquivo.type.indexOf('image/') !== 0) {
+    if (preview) {
+      preview.className = 'foto-cnh-preview ok';
+      preview.textContent = 'Selecione apenas imagem da CNH.';
+    }
+    input.value = '';
+    return;
+  }
+
+  redimensionarImagemParaBase64(arquivo, 1280, 0.75)
+    .then(function(resultado) {
+      fotoCnhMotoristaAtual = {
+        base64: resultado.base64,
+        mimeType: resultado.mimeType,
+        nomeArquivo: arquivo.name || 'cnh_motorista.jpg'
+      };
+
+      if (preview) {
+        preview.className = 'foto-cnh-preview ok';
+        preview.textContent = 'Foto da CNH carregada: ' + (arquivo.name || 'imagem selecionada');
+      }
+    })
+    .catch(function(err) {
+      fotoCnhMotoristaAtual = null;
+
+      if (preview) {
+        preview.className = 'foto-cnh-preview ok';
+        preview.textContent = 'Erro ao carregar imagem: ' + err.message;
+      }
+    });
+}
+
+function redimensionarImagemParaBase64(arquivo, tamanhoMaximo, qualidade) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      var img = new Image();
+
+      img.onload = function() {
+        var largura = img.width;
+        var altura = img.height;
+
+        if (largura > altura && largura > tamanhoMaximo) {
+          altura = Math.round(altura * tamanhoMaximo / largura);
+          largura = tamanhoMaximo;
+        } else if (altura > largura && altura > tamanhoMaximo) {
+          largura = Math.round(largura * tamanhoMaximo / altura);
+          altura = tamanhoMaximo;
+        }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = largura;
+        canvas.height = altura;
+
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, largura, altura);
+
+        var mimeType = 'image/jpeg';
+        var dataUrl = canvas.toDataURL(mimeType, qualidade || 0.75);
+        var base64 = dataUrl.split(',')[1];
+
+        resolve({
+          base64: base64,
+          mimeType: mimeType
+        });
+      };
+
+      img.onerror = function() {
+        reject(new Error('Não foi possível ler a imagem.'));
+      };
+
+      img.src = e.target.result;
+    };
+
+    reader.onerror = function() {
+      reject(new Error('Erro ao carregar o arquivo.'));
+    };
+
+    reader.readAsDataURL(arquivo);
+  });
+}
   
 </script>
 </body>
