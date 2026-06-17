@@ -546,7 +546,7 @@
         <div class="grid">
           <div class="campo full">
             <label>Nome do motorista</label>
-            <input type="text" id="motNome" maxlength="80" placeholder="Ex.: JOÃO DA SILVA" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="motNome" maxlength="80" placeholder="Ex.: JOÃO DA SILVA" oninput="campoNomePessoa(this)">
           </div>
           
           <div class="campo">
@@ -556,7 +556,7 @@
           
           <div class="campo">
             <label>RG</label>
-            <input type="text" id="motRg" maxlength="20" placeholder="Ex.: 12.345.678-9" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="motRg" maxlength="20" placeholder="Ex.: 12.345.678-9" oninput="campoRg(this)">
           </div>
           
           <div class="campo">
@@ -571,7 +571,7 @@
           
           <div class="campo full">
             <label>Transportadora</label>
-            <input type="text" id="motTransportadora" maxlength="80" placeholder="Ex.: HUGO TRANSPORTES" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="motTransportadora" maxlength="80" placeholder="Ex.: HUGO TRANSPORTES" oninput="campoTextoEmpresa(this)">
           </div>
           
           <div class="campo">
@@ -1490,7 +1490,54 @@
       observacao: document.getElementById('motObservacao').value,
       fotoCnh: fotoCnhMotoristaAtual
     };
-  
+
+    var nomeLimpo = String(dados.nome || '').trim();
+    var cpfLimpo = somenteNumeros(dados.cpf);
+    var cnhLimpa = somenteNumeros(dados.cnh);
+    var telefoneLimpo = somenteNumeros(dados.telefone);
+    var transportadoraLimpa = String(dados.transportadora || '').trim();
+    
+    if (nomeLimpo.length < 5) {
+      mostrarMensagemMotorista('erro', 'Informe o nome completo do motorista.');
+      return;
+    }
+    
+    if (!/^[A-ZÀ-ÚÃÕÂÊÎÔÛÁÉÍÓÚÇ\s]+$/i.test(nomeLimpo)) {
+      mostrarMensagemMotorista('erro', 'O nome do motorista deve conter apenas letras e espaços.');
+      return;
+    }
+    
+    if (cpfLimpo.length !== 11) {
+      mostrarMensagemMotorista('erro', 'Informe um CPF válido com 11 números.');
+      return;
+    }
+    
+    if (cnhLimpa.length < 9 || cnhLimpa.length > 11) {
+      mostrarMensagemMotorista('erro', 'Informe uma CNH válida com 9 a 11 números.');
+      return;
+    }
+    
+    if (telefoneLimpo.length !== 10 && telefoneLimpo.length !== 11) {
+      mostrarMensagemMotorista('erro', 'Informe um telefone válido com DDD.');
+      return;
+    }
+    
+    if (transportadoraLimpa.length < 2) {
+      mostrarMensagemMotorista('erro', 'Informe a transportadora ou escreva NA quando não houver.');
+      return;
+    }
+    
+    if (/^\d+$/.test(transportadoraLimpa)) {
+      mostrarMensagemMotorista('erro', 'A transportadora não pode conter apenas números. Informe o nome ou escreva NA.');
+      return;
+    }
+    
+    dados.nome = nomeLimpo;
+    dados.cpf = cpfLimpo;
+    dados.cnh = cnhLimpa;
+    dados.telefone = telefoneLimpo;
+    dados.transportadora = transportadoraLimpa;
+    
     chamarAPI('salvarMotoristaPortal', dados)
       .then(function(resp) {
         if (resp && resp.ok) {
@@ -1748,6 +1795,39 @@ function redimensionarImagemParaBase64(arquivo, tamanhoMaximo, qualidade) {
 
     reader.readAsDataURL(arquivo);
   });
+}
+
+function campoNomePessoa(campo) {
+  campo.value = String(campo.value || '')
+    .toUpperCase()
+    .replace(/[^A-ZÀ-ÚÃÕÂÊÎÔÛÁÉÍÓÚÇ\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .substring(0, 80);
+}
+
+function campoTextoEmpresa(campo) {
+  campo.value = String(campo.value || '')
+    .toUpperCase()
+    .replace(/[^A-ZÀ-ÚÃÕÂÊÎÔÛÁÉÍÓÚÇ0-9\s.&\/-]/g, '')
+    .replace(/\s+/g, ' ')
+    .substring(0, 80);
+}
+
+function campoRg(campo) {
+  campo.value = String(campo.value || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9.\-]/g, '')
+    .substring(0, 20);
+}
+
+function mostrarMensagemMotorista(tipo, texto) {
+  var msg = document.getElementById('msgMotorista');
+
+  if (!msg) return;
+
+  msg.className = 'msg ' + tipo;
+  msg.textContent = texto;
+  msg.style.display = 'block';
 }
   
 </script>
