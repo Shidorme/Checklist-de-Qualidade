@@ -518,7 +518,7 @@
           <p>Base de motoristas para programação e coletas.</p>
         </button>
     
-        <button class="modulo-card desabilitado" onclick="moduloEmBreve('Cadastro de Veículos')">
+        <button class="modulo-card" onclick="abrirModulo('veiculos')">
           <div class="modulo-icone">V</div>
           <h3>Cadastro de Veículos</h3>
           <p>Cadastro de placas, tipo de veículo e vínculo com transportadora.</p>
@@ -555,7 +555,106 @@
         </button>
       </div>
     </div>
+    
+<!-- ══════════ ÁREA DO MÓDULO VEÍCULOS ══════════ -->
+<div id="moduloVeiculos" class="area-modulo">
+  <button class="btn-voltar-portal" onclick="voltarPortal()">← Voltar ao Portal</button>
 
+  <div class="card">
+    <h2><span class="step">V</span> Cadastro de Veículos</h2>
+
+    <div class="grid">
+      <div class="campo">
+        <label>Placa</label>
+        <input type="text" id="veiPlaca" maxlength="8" placeholder="Ex.: ABC-1234 ou ABC1D23" oninput="validarCampoVeiculoTempoReal('placa')">
+        <div id="erroVeiPlaca" class="erro-campo"></div>
+      </div>
+
+      <div class="campo">
+        <label>Tipo de veículo</label>
+        <select id="veiTipo" onchange="validarCampoVeiculoTempoReal('tipo')">
+          <option value="">Selecione...</option>
+          <option value="UTILITÁRIO">UTILITÁRIO</option>
+          <option value="VAN">VAN</option>
+          <option value="VUC">VUC</option>
+          <option value="3/4">3/4</option>
+          <option value="TOCO">TOCO</option>
+          <option value="TRUCK">TRUCK</option>
+          <option value="CARRETA">CARRETA</option>
+          <option value="CARRETA LS">CARRETA LS</option>
+          <option value="BITREM">BITREM</option>
+          <option value="RODOTREM">RODOTREM</option>
+        </select>
+        <div id="erroVeiTipo" class="erro-campo"></div>
+      </div>
+
+      <div class="campo full">
+        <label>Modelo / descrição</label>
+        <input type="text" id="veiModelo" maxlength="80" placeholder="Ex.: VOLVO FH / BAÚ / SIDER" oninput="validarCampoVeiculoTempoReal('modelo')">
+        <div id="erroVeiModelo" class="erro-campo"></div>
+      </div>
+
+      <div class="campo full">
+        <label>Transportadora</label>
+        <input type="text" id="veiTransportadora" maxlength="80" placeholder="Ex.: HUGO TRANSPORTES ou NA" oninput="validarCampoVeiculoTempoReal('transportadora')">
+        <div id="erroVeiTransportadora" class="erro-campo"></div>
+      </div>
+
+      <div class="campo">
+        <label>Capacidade aproximada KG</label>
+        <input type="text" id="veiCapacidadeKg" maxlength="6" inputmode="numeric" placeholder="Ex.: 14000" oninput="validarCampoVeiculoTempoReal('capacidade')">
+        <div id="erroVeiCapacidadeKg" class="erro-campo"></div>
+      </div>
+
+      <div class="campo">
+        <label>Status</label>
+        <select id="veiStatus">
+          <option value="ATIVO">ATIVO</option>
+          <option value="INATIVO">INATIVO</option>
+        </select>
+      </div>
+
+      <div class="campo full">
+        <label>Documento do veículo / CRLV</label>
+        <input type="file" id="veiDocumento" accept="image/*,.pdf" onchange="prepararDocumentoVeiculo(this)">
+        <small style="font-size:.72rem;color:#667085;line-height:1.35;">
+          Anexe o CRLV ou documento do veículo em imagem ou PDF. O arquivo será salvo no Drive.
+        </small>
+        <div id="previewDocumentoVeiculo" class="foto-cnh-preview"></div>
+      </div>
+
+      <div class="campo full">
+        <label>Foto do veículo</label>
+        <input type="file" id="veiFoto" accept="image/*" capture="environment" onchange="prepararFotoVeiculo(this)">
+        <small style="font-size:.72rem;color:#667085;line-height:1.35;">
+          Tire uma foto do veículo ou selecione uma imagem da galeria. A foto será salva no Drive.
+        </small>
+        <div id="previewFotoVeiculo" class="foto-cnh-preview"></div>
+      </div>
+
+      <div class="campo full">
+        <label>Observação</label>
+        <textarea id="veiObservacao" maxlength="250" placeholder="Ex.: Veículo agregado / próprio / autorizado para coleta"></textarea>
+      </div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn-principal" onclick="salvarVeiculoPortalFront()">Salvar veículo</button>
+      <button class="btn-limpar" onclick="limparFormularioVeiculo()">Limpar</button>
+    </div>
+
+    <div id="msgVeiculo" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="step">L</span> Veículos cadastrados</h2>
+    <div id="listaVeiculosPortal" class="historico">
+      Carregando veículos...
+    </div>
+  </div>
+</div>
+
+    
     <!-- ══════════ ÁREA DO MÓDULO MOTORISTAS ══════════ -->
     <div id="moduloMotoristas" class="area-modulo">
       <button class="btn-voltar-portal" onclick="voltarPortal()">← Voltar ao Portal</button>
@@ -871,13 +970,10 @@
   function mostrarApp() {
     document.getElementById('telaLogin').style.display = 'none';
     document.getElementById('telaApp').style.display = 'block';
+  
     aplicarEmpresaNoApp();
     atualizarUsuarioLogadoNaTela();
-    carregarApp();
-  }
-  
-  function moduloEmBreve(nomeModulo) {
-    alert(nomeModulo + ' será liberado em uma próxima etapa.');
+    voltarPortal();
   }
   
   function atualizarUsuarioLogadoNaTela() {
@@ -902,6 +998,7 @@
     var portalHome = document.getElementById('portalHome');
     var moduloChecklist = document.getElementById('moduloChecklist');
     var moduloMotoristas = document.getElementById('moduloMotoristas');
+    var moduloVeiculos = document.getElementById('moduloVeiculos');
     var tituloModuloApp = document.getElementById('tituloModuloApp');
     var descricaoModuloApp = document.getElementById('descricaoModuloApp');
   
@@ -918,6 +1015,11 @@
       moduloMotoristas.classList.remove('ativo');
       moduloMotoristas.style.display = 'none';
     }
+
+    if (moduloVeiculos) {
+      moduloVeiculos.classList.remove('ativo');
+      moduloVeiculos.style.display = 'none';
+    }    
   
     if (modulo === 'checklist') {
       if (moduloChecklist) {
@@ -962,7 +1064,29 @@
       window.scrollTo(0, 0);
       return;
     }
-  
+
+    if (modulo === 'veiculos') {
+      if (moduloVeiculos) {
+        moduloVeiculos.classList.add('ativo');
+        moduloVeiculos.style.display = 'block';
+      } else {
+        alert('Erro: área de Veículos não encontrada no HTML.');
+        return;
+      }
+    
+      if (tituloModuloApp) {
+        tituloModuloApp.textContent = 'Cadastro de Veículos';
+      }
+    
+      if (descricaoModuloApp) {
+        descricaoModuloApp.textContent = 'Cadastro, consulta e controle de veículos para programação e coletas.';
+      }
+    
+      listarVeiculosPortalFront();
+      window.scrollTo(0, 0);
+      return;
+    }
+    
     moduloEmBreve(modulo);
   }
   
@@ -970,6 +1094,7 @@
     var portalHome = document.getElementById('portalHome');
     var moduloChecklist = document.getElementById('moduloChecklist');
     var moduloMotoristas = document.getElementById('moduloMotoristas');
+    var moduloVeiculos = document.getElementById('moduloVeiculos');
     var tituloModuloApp = document.getElementById('tituloModuloApp');
     var descricaoModuloApp = document.getElementById('descricaoModuloApp');
   
@@ -982,6 +1107,11 @@
       moduloMotoristas.classList.remove('ativo');
       moduloMotoristas.style.display = 'none';
     }
+
+    if (moduloVeiculos) {
+      moduloVeiculos.classList.remove('ativo');
+      moduloVeiculos.style.display = 'none';
+    }    
   
     if (portalHome) {
       portalHome.style.display = 'block';
