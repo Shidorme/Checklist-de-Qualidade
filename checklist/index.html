@@ -255,6 +255,18 @@
       letter-spacing: .09em; color: var(--gauge-unit); text-transform: uppercase; pointer-events: none;
     }
 
+    .micragem-grade { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .gauge-mini input { font-size: 1rem; padding-right: 36px; min-height: 54px; }
+    .gauge-mini .gauge-unidade { font-size: .56rem; right: 10px; }
+    .gauge-rotulo {
+      display: block; margin-top: 5px; text-align: center;
+      font-size: .62rem; font-weight: 700; color: var(--ink-soft);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .gauge-media { margin-top: 10px; }
+    .gauge-media input { border-color: var(--pine-600); background: #0d1f17; }
+    .gauge-media .gauge-rotulo { color: var(--pine-700); }
+
     /* Faixa compacta com dados da remessa em andamento */
     .linha-info {
       display: none; position: sticky; top: 8px; z-index: 20;
@@ -515,10 +527,28 @@
             </div>
           </div>
           <div class="campo oculto" id="campoMicragem">
-            <label>Micragem informada</label>
-            <div class="gauge">
-              <input id="micragemInformada" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this)">
+            <label>Aferições de micragem (3 pontos)</label>
+            <div class="micragem-grade">
+              <div class="gauge gauge-mini">
+                <input id="micragemPonta1" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this); calcularMediaMicragem();">
+                <span class="gauge-unidade" id="gaugeUnidadeMicragemP1"></span>
+                <span class="gauge-rotulo">Ponta 1</span>
+              </div>
+              <div class="gauge gauge-mini">
+                <input id="micragemMeio" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this); calcularMediaMicragem();">
+                <span class="gauge-unidade" id="gaugeUnidadeMicragemP2"></span>
+                <span class="gauge-rotulo">Meio</span>
+              </div>
+              <div class="gauge gauge-mini">
+                <input id="micragemPonta2" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this); calcularMediaMicragem();">
+                <span class="gauge-unidade" id="gaugeUnidadeMicragemP3"></span>
+                <span class="gauge-rotulo">Ponta 2</span>
+              </div>
+            </div>
+            <div class="gauge gauge-media">
+              <input id="micragemInformada" type="text" readonly placeholder="0,00">
               <span class="gauge-unidade" id="gaugeUnidadeMicragem"></span>
+              <span class="gauge-rotulo">Média das 3 aferições (calculada)</span>
             </div>
           </div>
 
@@ -853,7 +883,7 @@
     if (!getVal('idMaterial')) { setMsg('msgItem', 'Leia o ID Material antes de salvar.', 'erro'); return; }
     if (estado.tipoConferencia === 'PESAGEM'  && !getVal('pesoInformado'))     { setMsg('msgItem', 'Informe o peso.', 'erro'); return; }
     if (estado.tipoConferencia === 'METRAGEM' && !getVal('metragemInformada')) { setMsg('msgItem', 'Informe a metragem.', 'erro'); return; }
-    if (estado.tipoConferencia === 'MICRAGEM' && !getVal('micragemInformada')) { setMsg('msgItem', 'Informe a micragem.', 'erro'); return; }
+    if (estado.tipoConferencia === 'MICRAGEM' && (!getVal('micragemPonta1') || !getVal('micragemMeio') || !getVal('micragemPonta2'))) { setMsg('msgItem', 'Informe as 3 aferições de micragem (ponta 1, meio e ponta 2).', 'erro'); return; }
 
     var btn = document.getElementById('btnSalvarItem');
     btn.disabled = true; btn.textContent = 'Comprimindo fotos...';
@@ -871,6 +901,7 @@
         material: getVal('materialItem'), lote: getVal('lote'),
         pesoInformado: getVal('pesoInformado'), metragemInformada: getVal('metragemInformada'),
         micragemInformada: getVal('micragemInformada'), unidade: getVal('unidade'),
+        micragemPonta1: getVal('micragemPonta1'), micragemMeio: getVal('micragemMeio'), micragemPonta2: getVal('micragemPonta2'),
         condicaoMaterial: getVal('condicaoMaterial'), statusInspecao: getVal('statusInspecao'),
         observacao: getVal('observacao'), fotoMaterial: fotoMaterial, fotoPeso: fotoPeso,
         usuarioEmail: usuarioLogado ? usuarioLogado.email : ''
@@ -1085,7 +1116,7 @@
   // UTILITÁRIOS
   // ════════════════════════════════════════════════════════
   function limparItem() {
-    ['idMaterial','lote','pesoInformado','metragemInformada','micragemInformada','observacao'].forEach(function(id) {
+    ['idMaterial','lote','pesoInformado','metragemInformada','micragemInformada','micragemPonta1','micragemMeio','micragemPonta2','observacao'].forEach(function(id) {
       document.getElementById(id).value = '';
     });
     document.getElementById('fotoMaterial').value = '';
@@ -1165,10 +1196,25 @@
 
   function atualizarUnidadeGauge() {
     var val = getVal('unidade');
-    ['gaugeUnidadePeso','gaugeUnidadeMetragem','gaugeUnidadeMicragem'].forEach(function(id) {
+    ['gaugeUnidadePeso','gaugeUnidadeMetragem','gaugeUnidadeMicragem','gaugeUnidadeMicragemP1','gaugeUnidadeMicragemP2','gaugeUnidadeMicragemP3'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.textContent = val || '';
     });
+  }
+
+  function calcularMediaMicragem() {
+    var brutos = [getVal('micragemPonta1'), getVal('micragemMeio'), getVal('micragemPonta2')];
+    var valores = brutos
+      .map(function(v) { return parseFloat(String(v).replace(',', '.')); })
+      .filter(function(v) { return !isNaN(v); });
+
+    var campoMedia = document.getElementById('micragemInformada');
+    if (!campoMedia) return;
+
+    if (valores.length === 0) { campoMedia.value = ''; return; }
+
+    var media = valores.reduce(function(a, b) { return a + b; }, 0) / valores.length;
+    campoMedia.value = media.toFixed(2).replace('.', ',');
   }
 
   function atualizarRotulosFotos(tipo) {
