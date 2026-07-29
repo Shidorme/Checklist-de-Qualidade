@@ -4,157 +4,210 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Checklist de Qualidade — Central de Recebimento</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"></noscript>
 
   <style>
     :root {
-      --verde: #007a3d;
-      --verde-escuro: #004533;
-      --verde-claro: #e8f5ee;
-      --fundo: #f3f6f5;
-      --branco: #ffffff;
-      --texto: #101828;
-      --muted: #667085;
-      --borda: #d0d5dd;
-      --erro: #b42318;
-      --erro-bg: #fef3f2;
-      --ok: #027a48;
-      --ok-bg: #ecfdf3;
-      --preto: #101828;
+      --ink: #10201a;
+      --ink-soft: #4b5a54;
+      --paper: #f3f5f3;
+      --card: #ffffff;
+      --line: #dde3df;
+
+      --pine-900: #06301f;
+      --pine-700: #0c6b3f;
+      --pine-600: #0f7d49;
+      --pine-100: #e6f5ec;
+
+      --amber: #e8940c;
+      --amber-ink: #6b4300;
+      --amber-100: #fdf1dc;
+
+      --red: #b42318;
+      --red-100: #fdeceb;
+
+      --gauge-bg: #0d1b16;
+      --gauge-line: #16342a;
+      --gauge-fg: #8bf7c4;
+      --gauge-unit: #5fd8a0;
+
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 11px;
+
+      --shadow-card: 0 1px 2px rgba(16,32,26,.05), 0 10px 26px -14px rgba(16,32,26,.22);
+      --shadow-pop: 0 10px 30px -8px rgba(6,48,31,.35);
+
+      --font-display: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Roboto Mono', monospace;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     html, body {
       width: 100%; min-height: 100%; margin: 0; padding: 0;
-      background: var(--fundo); color: var(--texto);
-      font-family: Arial, Helvetica, sans-serif; overflow-x: hidden;
+      background: var(--paper); color: var(--ink);
+      font-family: var(--font-body); overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    body { font-size: 18px; }
+    body { font-size: 16.5px; line-height: 1.4; }
+
+    button, input, select, textarea { font-family: inherit; }
+
+    a { color: inherit; }
+
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
     /* ── TELA DE LOGIN ── */
     #telaLogin {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 100dvh;
-      padding: 24px 20px; background: var(--fundo);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100dvh; padding: 24px 20px;
+      background:
+        radial-gradient(1100px 480px at 50% -10%, rgba(15,125,73,.18), transparent 60%),
+        var(--paper);
     }
 
     .login-card {
       width: 100%; max-width: 420px;
-      background: white; border-radius: 24px; padding: 32px 24px;
-      box-shadow: 0 8px 32px rgba(16,24,40,.12);
-      border: 1px solid #e7ecea; text-align: center;
+      background: var(--card); border-radius: var(--radius-lg); padding: 34px 26px 26px;
+      box-shadow: var(--shadow-pop);
+      border: 1px solid var(--line); text-align: center;
     }
 
-    .login-logo {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 64px; height: 64px; border-radius: 18px;
-      background: linear-gradient(135deg, var(--verde-escuro), var(--verde));
-      margin-bottom: 20px; font-size: 2rem;
+    .login-logo-empresa {
+      width: 100px; height: 72px; margin: 0 auto 18px;
+      border-radius: 16px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--pine-700); color: white;
+      font-family: var(--font-display); font-weight: 700; letter-spacing: .07em;
+      font-size: 1.25rem;
     }
 
-    .login-card h1 { font-size: 1.3rem; color: var(--verde-escuro); margin: 0 0 6px; }
-    .login-card p  { font-size: 0.88rem; color: var(--muted); margin: 0 0 24px; }
+    .login-card h1 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.4rem; color: var(--pine-900); margin: 0 0 4px; letter-spacing: -.01em;
+    }
+    .login-card p { font-size: .88rem; color: var(--ink-soft); margin: 0 0 24px; }
 
+    .campo-empresa label,
+    .login-card > label {
+      display: block; text-align: left;
+      font-size: .68rem; font-weight: 700; color: var(--ink-soft);
+      text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px;
+    }
+
+    .login-card select,
     .login-card input {
-      width: 100%; min-height: 52px; border: 1px solid var(--borda);
+      width: 100%; min-height: 52px; border: 1.5px solid var(--line);
       border-radius: 14px; padding: 13px; font-size: 1rem;
-      background: white; color: var(--texto); outline: none;
-      margin-bottom: 12px; appearance: none;
+      background: white; color: var(--ink); outline: none;
+      margin-bottom: 14px; appearance: none;
     }
 
-    .login-card input:focus { border-color: var(--verde); box-shadow: 0 0 0 4px rgba(0,122,61,.1); }
+    .login-card select {
+      background-image: linear-gradient(45deg,transparent 50%,#667085 50%),linear-gradient(135deg,#667085 50%,transparent 50%);
+      background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+      background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; padding-right: 36px;
+    }
+
+    .login-card select:focus,
+    .login-card input:focus { border-color: var(--pine-600); box-shadow: 0 0 0 4px rgba(15,125,73,.14); }
 
     .btn-login {
-      width: 100%; min-height: 52px; border: 0; border-radius: 14px;
-      background: var(--verde); color: white; font-size: 1rem;
-      font-weight: 800; cursor: pointer; margin-top: 4px;
-      box-shadow: 0 4px 12px rgba(0,122,61,.22);
-      transition: background 0.2s ease;
+      width: 100%; min-height: 54px; border: 0; border-radius: 14px;
+      background: var(--pine-700); color: white; font-size: 1rem;
+      font-weight: 700; font-family: var(--font-display); letter-spacing: .01em;
+      cursor: pointer; margin-top: 2px;
+      box-shadow: 0 8px 18px -6px rgba(12,107,63,.55);
+      transition: background .15s ease, transform .1s ease;
+    }
+    .btn-login:hover { background: var(--pine-900); }
+    .btn-login:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+
+    .msg-login {
+      margin-top: 12px; padding: 11px 13px; border-radius: 12px;
+      font-size: .85rem; color: var(--red); background: var(--red-100);
+      border: 1px solid #f6c3bd; display: none; text-align: left;
     }
 
-    .btn-login:hover { background: var(--verde-escuro); }
-    .btn-login:disabled { opacity: .55; cursor: not-allowed; }
-    .msg-login { margin-top: 12px; font-size: .85rem; color: var(--erro); display: none; }
-
-    /* Logo empresa no login */
-    .login-logo-empresa {
-      width: 120px; height: 80px; display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px; background: #f9fafb; border-radius: 16px;
-      border: 1px solid #e7ecea; overflow: hidden;
-    }
-    .login-logo-empresa img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-    /* Footer GeoSystem */
     .login-footer {
-      display: flex; align-items: center; justify-content: center;
-      margin-top: 20px; padding-top: 16px; border-top: 1px solid #edf0ef;
-      font-size: .72rem; color: #667085;
+      margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line);
+      font-size: .7rem; color: #94a29b; letter-spacing: .03em;
     }
 
     /* ── APP PRINCIPAL ── */
     #telaApp { display: none; }
 
-    .app { width: 100%; max-width: 560px; margin: 0 auto; padding: 0 12px 28px; }
+    .app { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 12px 34px; }
 
     .topo {
-      margin: 0 -12px 12px; padding: 18px 16px 20px;
-      background: linear-gradient(135deg, var(--verde-escuro), var(--verde));
-      color: white; border-radius: 0 0 22px 22px;
-      box-shadow: 0 8px 22px rgba(0,0,0,.16);
+      margin: 0 -12px 14px; padding: 16px 16px 18px;
+      background: linear-gradient(160deg, var(--pine-900), var(--pine-700) 78%);
+      color: white; border-radius: 0 0 26px 26px;
+      box-shadow: var(--shadow-pop);
     }
 
-    .topo-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .topo-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 
     .topo .tag {
-      display: inline-block; margin-bottom: 8px; padding: 5px 9px;
-      border-radius: 999px; background: rgba(255,255,255,.16);
-      font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+      display: inline-block; margin-bottom: 7px; padding: 5px 10px;
+      border-radius: 999px; background: rgba(255,255,255,.14);
+      font-size: .64rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
     }
 
-    .topo h1 { margin: 0; font-size: 1.42rem; line-height: 1.15; }
-    .topo p  { margin: 8px 0 0; font-size: .88rem; line-height: 1.35; opacity: .95; }
+    .topo h1 {
+      margin: 0; font-family: var(--font-display); font-weight: 700;
+      font-size: 1.32rem; line-height: 1.12; letter-spacing: -.01em;
+    }
+    .topo p { margin: 6px 0 0; font-size: .84rem; line-height: 1.35; opacity: .82; }
+
+    .topo-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 
     .btn-sair {
-      flex-shrink: 0; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
-      color: white; font-size: .75rem; font-weight: 700; border-radius: 10px;
-      padding: 6px 10px; cursor: pointer; min-height: unset; width: auto; margin-top: 4px;
+      flex-shrink: 0; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28);
+      color: white; font-size: .72rem; font-weight: 700; border-radius: 10px;
+      padding: 7px 12px; cursor: pointer; min-height: unset; width: auto;
     }
+    .btn-sair:hover { background: rgba(255,255,255,.24); }
 
     .usuario-logado-box {
-      margin-top: 8px;
-      font-size: .72rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, .88);
-      letter-spacing: .3px;
-      line-height: 1.3;
+      margin-top: 10px; font-size: .71rem; font-weight: 600;
+      color: rgba(255,255,255,.75); letter-spacing: .02em; line-height: 1.3;
     }
 
     .topo-logo-empresa {
-      width: 48px; height: 36px; border-radius: 8px; overflow: hidden;
-      background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      width: 42px; height: 42px; border-radius: 11px; overflow: hidden;
+      background: rgba(255,255,255,.16); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-family: var(--font-display); font-weight: 700;
+      font-size: .78rem; letter-spacing: .04em;
     }
-    .topo-logo-empresa img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-    .campo-empresa { width: 100%; }
-
+    /* ── CARDS ── */
     .card {
-      width: 100%; background: var(--branco); border: 1px solid #e7ecea;
-      border-radius: 20px; padding: 16px; margin-bottom: 12px;
-      box-shadow: 0 5px 18px rgba(16,24,40,.08);
+      width: 100%; background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius-lg); padding: 18px; margin-bottom: 12px;
+      box-shadow: var(--shadow-card);
     }
 
     .card h2 {
-      display: flex; align-items: center; gap: 8px;
-      margin: 0 0 14px; font-size: 1.08rem; color: var(--verde-escuro); line-height: 1.25;
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 0 15px; font-family: var(--font-display); font-weight: 700;
+      font-size: 1.02rem; color: var(--pine-900); line-height: 1.25;
     }
 
     .step {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 28px; height: 28px; border-radius: 999px;
-      background: var(--verde); color: white; font-size: .82rem; flex: 0 0 auto;
+      width: 26px; height: 26px; border-radius: 8px;
+      background: var(--pine-100); color: var(--pine-700);
+      font-family: var(--font-mono); font-weight: 700; font-size: .82rem; flex: 0 0 auto;
     }
 
     .grid { display: grid; grid-template-columns: 1fr; gap: 13px; width: 100%; }
@@ -162,12 +215,12 @@
     .campo { display: flex; flex-direction: column; width: 100%; gap: 6px; }
     .campo.full { grid-column: 1 / -1; }
 
-    label { font-size: .72rem; font-weight: 800; color: #344054; text-transform: uppercase; letter-spacing: .35px; }
+    label { font-size: .68rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
 
     input, select, textarea {
-      width: 100%; min-height: 58px; border: 1px solid var(--borda);
-      border-radius: 16px; padding: 14px 13px; font-size: 1rem;
-      background: white; color: var(--texto); outline: none; appearance: none;
+      width: 100%; min-height: 56px; border: 1.5px solid var(--line);
+      border-radius: var(--radius-md); padding: 13px; font-size: 1rem;
+      background: white; color: var(--ink); outline: none; appearance: none;
     }
 
     select {
@@ -176,95 +229,147 @@
       background-size: 6px 6px,6px 6px; background-repeat: no-repeat; padding-right: 36px;
     }
 
-    textarea { min-height: 104px; resize: vertical; line-height: 1.35; }
+    textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
 
-    input[type="file"] { min-height: 58px; padding: 14px 12px; font-size: .88rem; background: #f9fafb; border-style: dashed; }
-    input:disabled, select:disabled { background: #f4f6f5; color: #475467; opacity: 1; }
-    input:focus, select:focus, textarea:focus { border-color: var(--verde); box-shadow: 0 0 0 4px rgba(0,122,61,.12); }
+    input[type="file"] { min-height: 56px; padding: 13px 12px; font-size: .86rem; background: #f9fafb; border-style: dashed; }
+    input:disabled, select:disabled { background: #f4f6f5; color: #8b968f; opacity: 1; }
+    input:focus, select:focus, textarea:focus { border-color: var(--pine-600); box-shadow: 0 0 0 4px rgba(15,125,73,.12); }
 
-    .linha-info {
-      display: none; position: sticky; top: 0; z-index: 20;
-      margin-bottom: 12px; padding: 12px 13px; border: 1px solid #b7e4c7;
-      border-radius: 18px; background: #e9f8ef; color: #12372a;
-      box-shadow: 0 5px 16px rgba(16,24,40,.08); font-size: .83rem; line-height: 1.35;
+    /* Visor de medição (gauge) — peso / metragem / micragem */
+    .gauge { position: relative; }
+
+    .gauge input {
+      background: var(--gauge-bg); border: 1.5px solid var(--gauge-line); color: var(--gauge-fg);
+      font-family: var(--font-mono); font-weight: 600; font-size: 1.55rem; letter-spacing: .02em;
+      text-align: right; padding-right: 58px; min-height: 62px;
+    }
+    .gauge input::placeholder { color: #2f6b53; }
+    .gauge input:focus { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(232,148,12,.22); }
+
+    .gauge-unidade {
+      position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+      font-family: var(--font-display); font-size: .68rem; font-weight: 700;
+      letter-spacing: .09em; color: var(--gauge-unit); text-transform: uppercase; pointer-events: none;
     }
 
-    .linha-info div { margin-bottom: 4px; word-break: break-word; }
-    .linha-info div:last-child { margin-bottom: 0; }
-    .linha-info strong { color: var(--verde-escuro); }
+    /* Faixa compacta com dados da remessa em andamento */
+    .linha-info {
+      display: none; position: sticky; top: 8px; z-index: 20;
+      margin-bottom: 12px; padding: 10px 12px; border: 1px solid #c3e6d2;
+      border-radius: var(--radius-md); background: var(--pine-100); color: var(--pine-900);
+      box-shadow: 0 6px 18px -8px rgba(6,48,31,.25);
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+    .chip {
+      font-size: .74rem; line-height: 1.3; white-space: nowrap;
+      display: inline-flex; align-items: baseline; gap: 4px;
+    }
+    .chip b { font-weight: 700; color: var(--pine-700); font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; }
 
     .acoes { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; width: 100%; }
 
     button {
-      width: 100%; min-height: 58px; border: 0; border-radius: 17px;
-      padding: 14px 16px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: .15s ease;
+      width: 100%; min-height: 56px; border: 0; border-radius: 16px;
+      padding: 14px 16px; font-size: .98rem; font-weight: 700;
+      font-family: var(--font-display); letter-spacing: .01em;
+      cursor: pointer; transition: transform .1s ease, background .15s ease, opacity .15s ease;
     }
 
-    button:active { transform: scale(.99); }
-    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    @media (prefers-reduced-motion: no-preference) {
+      button:active { transform: scale(.98); }
+    }
+    button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-    .btn-principal { background: var(--verde); color: white; box-shadow: 0 5px 12px rgba(0,122,61,.22); }
-    .btn-principal:hover { background: var(--verde-escuro); }
-    .btn-finalizar { background: var(--preto); color: white; }
-    .btn-limpar { background: #eef1f0; color: #344054; }
-    .btn-camera { background: #e8f5ee; color: var(--verde-escuro); border: 1px solid #b7e4c7; }
+    .btn-principal { background: var(--pine-700); color: white; box-shadow: 0 8px 18px -6px rgba(12,107,63,.5); }
+    .btn-principal:hover { background: var(--pine-900); }
+
+    .btn-camera {
+      background: var(--amber); color: var(--amber-ink);
+      box-shadow: 0 8px 18px -6px rgba(232,148,12,.5);
+    }
+    .btn-camera:hover { filter: brightness(.95); }
+
+    .btn-finalizar { background: var(--ink); color: white; }
+    .btn-finalizar:hover { background: #000; }
+
+    .btn-limpar { background: #eef1f0; color: #344054; box-shadow: none; }
+    .btn-limpar:hover { background: #e5e9e7; }
 
     .btn-relatorio {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 14px 16px; border-radius: 14px; font-size: 0.92rem; font-weight: 700;
+      padding: 14px 16px; border-radius: var(--radius-md); font-size: .9rem; font-weight: 700;
+      font-family: var(--font-display);
       text-decoration: none; color: white; width: 100%; min-height: 52px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.15); transition: opacity 0.2s ease;
+      box-shadow: 0 6px 16px -6px rgba(0,0,0,.25); transition: opacity .15s ease;
     }
-    .btn-relatorio:hover { opacity: 0.9; }
-    .btn-pdf { background: #b42318; }
-    .btn-excel { background: #027a48; }
+    .btn-relatorio:hover { opacity: .88; }
+    .btn-pdf { background: var(--red); }
+    .btn-excel { background: var(--pine-700); }
 
-    .msg { display: none; margin-top: 12px; border-radius: 16px; padding: 13px; font-size: .9rem; line-height: 1.4; }
-    .msg.ok  { display: block; background: var(--ok-bg);   color: var(--ok);   border: 1px solid #abefc6; }
-    .msg.erro{ display: block; background: var(--erro-bg); color: var(--erro); border: 1px solid #fecdca; }
+    /* ── MENSAGENS ── */
+    .msg { display: none; margin-top: 12px; border-radius: 14px; padding: 12px 13px; font-size: .87rem; line-height: 1.4; }
+    .msg.ok    { display: block; background: #eafaf1; color: var(--pine-700); border: 1px solid #b9ecce; }
+    .msg.erro  { display: block; background: var(--red-100); color: var(--red); border: 1px solid #f6c3bd; }
+    .msg.carregando { display: block; background: #f1f4f2; color: var(--ink-soft); border: 1px solid var(--line); }
 
+    /* ── CONTADOR ── */
     .contador-box {
       display: none; margin-bottom: 12px; padding: 12px 14px;
-      border-radius: 18px; background: white; border: 1px solid #e7ecea;
-      box-shadow: 0 4px 14px rgba(16,24,40,.06);
+      border-radius: var(--radius-md); background: white; border: 1px solid var(--line);
+      box-shadow: var(--shadow-card);
+      align-items: center; justify-content: space-between;
+      flex-direction: row;
+    }
+    .contador-box span { color: var(--ink-soft); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .contador-box strong { color: var(--pine-700); font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; }
+
+    /* ── HISTÓRICO ── */
+    .historico { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .historico strong { display: block; font-size: .74rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .historico ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .historico li {
+      font-family: var(--font-mono); font-size: .8rem; line-height: 1.4; color: var(--ink);
+      background: #f7f9f8; border: 1px solid var(--line); border-radius: 10px;
+      padding: 8px 10px;
     }
 
-    .contador-box span { display: block; color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .35px; }
-    .contador-box strong { display: block; margin-top: 4px; color: var(--verde-escuro); font-size: 1.3rem; }
-
-    .historico { margin-top: 14px; padding-top: 12px; border-top: 1px solid #edf0ef; font-size: .85rem; line-height: 1.4; color: #475467; }
-    .historico strong { color: var(--texto); }
-    .historico ul { padding-left: 18px; margin: 8px 0 0; }
-    .historico li { margin-bottom: 6px; }
-
-    .resumo { display: none; background: white; border: 1px solid #e7ecea; border-radius: 20px; padding: 16px; margin-top: 12px; box-shadow: 0 5px 18px rgba(16,24,40,.08); }
+    /* ── RESUMO ── */
+    .resumo { display: none; background: white; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; margin-top: 12px; box-shadow: var(--shadow-card); }
     .resumo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 
-    .mini-card { background: #f9fafb; border: 1px solid #eaecf0; border-radius: 16px; padding: 12px 8px; text-align: center; }
-    .mini-card span { display: block; color: var(--muted); font-size: .68rem; line-height: 1.2; font-weight: 700; text-transform: uppercase; }
-    .mini-card strong { display: block; margin-top: 5px; font-size: 1.15rem; color: var(--verde-escuro); }
+    .mini-card { background: #f7f9f8; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px 8px; text-align: center; }
+    .mini-card span { display: block; color: var(--ink-soft); font-size: .64rem; line-height: 1.2; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .mini-card strong { display: block; margin-top: 5px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--pine-900); }
 
     .oculto { display: none !important; }
+
+    /* ── LOADING (skeleton simples) ── */
+    .skeleton { position: relative; overflow: hidden; background: #e9edea; border-radius: var(--radius-md); }
+    .skeleton::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+      transform: translateX(-100%); animation: shimmer 1.3s infinite;
+    }
+    @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
 
     /* ── SCANNER OVERLAY ── */
     #scannerOverlay {
       display: none; position: fixed; inset: 0; z-index: 100;
       background: #000; flex-direction: column;
     }
-
     #scannerOverlay.ativo { display: flex; }
 
     .scanner-topo {
-      padding: 16px; background: #004533;
-      text-align: center; font-size: 1rem; font-weight: 800; color: white;
+      padding: 16px; background: var(--pine-900);
+      text-align: center; font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white;
     }
-
-    .scanner-sub { font-size: .75rem; font-weight: 400; opacity: .8; margin-top: 3px; }
+    .scanner-sub { font-size: .74rem; font-weight: 500; opacity: .75; margin-top: 3px; }
 
     #scannerReader { width: 100%; flex: 1; background: #000; }
     #scannerReader video { width: 100% !important; height: 100% !important; object-fit: cover; }
-
-    #scannerReader #qr-shaded-region { border-width: 2px !important; }
+    #scannerReader #qr-shaded-region { border-width: 2px !important; border-color: var(--amber) !important; }
     #scannerReader #html5-qrcode-anchor-scan-type-change { display: none !important; }
     #scannerReader #html5-qrcode-button-camera-stop { display: none !important; }
 
@@ -273,19 +378,18 @@
       background: #111; color: white; min-height: 52px;
       display: flex; align-items: center; justify-content: center;
     }
-
-    .scanner-status.ok   { background: #027a48; font-size: 1rem; font-weight: 700; }
-    .scanner-status.erro { background: #b42318; font-size: .85rem; }
+    .scanner-status.ok   { background: var(--pine-700); font-weight: 700; }
+    .scanner-status.erro { background: var(--red); font-size: .85rem; }
 
     .btn-scanner-fechar {
-      margin: 10px 16px; padding: 14px; border: 0; border-radius: 14px;
-      background: #333; color: white; font-size: 1rem; font-weight: 700; cursor: pointer;
+      margin: 10px 16px; padding: 14px; border: 0; border-radius: var(--radius-md);
+      background: #262626; color: white; font-family: var(--font-display); font-size: 1rem; font-weight: 700; cursor: pointer;
       width: calc(100% - 32px); min-height: unset;
     }
 
     @media (min-width: 700px) {
-      body { font-size: 17px; }
-      .app { max-width: 620px; }
+      body { font-size: 16px; }
+      .app { max-width: 640px; }
     }
   </style>
 </head>
@@ -294,15 +398,14 @@
 <!-- ══════════ TELA DE LOGIN ══════════ -->
 <div id="telaLogin">
   <div class="login-card">
-    <div class="login-logo-empresa" id="logoEmpresaLogin">
-      <span style="font-size:2.5rem">🏢</span>
-    </div>
+    <div class="login-logo-empresa" id="logoEmpresaLogin">—</div>
+
     <h1 id="nomeEmpresaLogin">Checklist de Qualidade</h1>
     <p>Selecione a empresa e entre com seu e-mail corporativo.</p>
 
     <div class="campo-empresa">
-      <label style="font-size:.75rem;font-weight:800;color:#344054;text-transform:uppercase;letter-spacing:.35px;">Empresa</label>
-      <select id="loginEmpresa" onchange="selecionarEmpresa(this.value)" style="min-height:52px;border:1px solid #d0d5dd;border-radius:14px;padding:13px;font-size:1rem;background:white;width:100%;margin-bottom:12px;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#667085 50%),linear-gradient(135deg,#667085 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:36px;">
+      <label>Empresa</label>
+      <select id="loginEmpresa" onchange="selecionarEmpresa(this.value)">
         <option value="">Selecione a empresa...</option>
         <option value="GEOMEMBRANA">Geomembrana Geossintéticos</option>
         <option value="LONAFORT">Lonafort</option>
@@ -310,15 +413,16 @@
       </select>
     </div>
 
+    <label style="margin-top:0;">E-mail</label>
     <input type="email" id="loginEmail" placeholder="seu@empresa.com.br" autocomplete="email">
+
+    <label>Senha</label>
     <input type="password" id="loginSenha" placeholder="Senha" autocomplete="current-password">
 
     <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Entrar</button>
     <div class="msg-login" id="msgLogin"></div>
 
-    <div class="login-footer">
-      <span>GeoSystem App &copy; 2026</span>
-    </div>
+    <div class="login-footer">GeoSystem App &copy; 2026</div>
   </div>
 </div>
 
@@ -332,8 +436,8 @@
           <h1>Checklist de Qualidade</h1>
           <p>Recebimento de materiais, insumos e conferências.</p>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-          <div class="topo-logo-empresa" id="topoLogoEmpresa">🏢</div>
+        <div class="topo-actions">
+          <div class="topo-logo-empresa" id="topoLogoEmpresa">—</div>
           <button class="btn-sair" onclick="fazerLogout()">Sair</button>
         </div>
       </div>
@@ -359,12 +463,14 @@
       </div>
 
       <div class="linha-info" id="boxRemessa">
-        <div><strong>ID Remessa:</strong> <span id="txtIdRemessa"></span></div>
-        <div><strong>Responsável:</strong> <span id="txtResponsavel"></span></div>
-        <div><strong>Fornecedor:</strong> <span id="txtFornecedor"></span></div>
-        <div><strong>NF:</strong> <span id="txtNf"></span></div>
-        <div><strong>Pedido Compra:</strong> <span id="txtPedidoCompra"></span></div>
-        <div><strong>Tipo:</strong> <span id="txtTipoConferencia"></span></div>
+        <div class="chips">
+          <span class="chip"><b>ID</b> <span id="txtIdRemessa"></span></span>
+          <span class="chip"><b>Resp.</b> <span id="txtResponsavel"></span></span>
+          <span class="chip"><b>Fornec.</b> <span id="txtFornecedor"></span></span>
+          <span class="chip"><b>NF</b> <span id="txtNf"></span></span>
+          <span class="chip"><b>PC</b> <span id="txtPedidoCompra"></span></span>
+          <span class="chip"><b>Tipo</b> <span id="txtTipoConferencia"></span></span>
+        </div>
       </div>
 
       <div class="contador-box" id="boxContador">
@@ -393,18 +499,27 @@
 
           <div class="campo" id="campoPeso">
             <label>Peso informado</label>
-            <input id="pesoInformado" type="text" inputmode="decimal" placeholder="Ex: 29,40" oninput="formatarDecimalVirgula(this)">
+            <div class="gauge">
+              <input id="pesoInformado" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this)">
+              <span class="gauge-unidade" id="gaugeUnidadePeso"></span>
+            </div>
           </div>
           <div class="campo oculto" id="campoMetragem">
             <label>Metragem informada</label>
-            <input id="metragemInformada" type="text" inputmode="decimal" placeholder="Ex: 12,50" oninput="formatarDecimalVirgula(this)">
+            <div class="gauge">
+              <input id="metragemInformada" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this)">
+              <span class="gauge-unidade" id="gaugeUnidadeMetragem"></span>
+            </div>
           </div>
           <div class="campo oculto" id="campoMicragem">
             <label>Micragem informada</label>
-            <input id="micragemInformada" type="text" inputmode="decimal" placeholder="Ex: 0,80" oninput="formatarDecimalVirgula(this)">
+            <div class="gauge">
+              <input id="micragemInformada" type="text" inputmode="decimal" placeholder="0,00" oninput="formatarDecimalVirgula(this)">
+              <span class="gauge-unidade" id="gaugeUnidadeMicragem"></span>
+            </div>
           </div>
 
-          <div class="campo"><label>Unidade</label><select id="unidade"></select></div>
+          <div class="campo"><label>Unidade</label><select id="unidade" onchange="atualizarUnidadeGauge()"></select></div>
           <div class="campo"><label>Condição do material</label><select id="condicaoMaterial"></select></div>
           <div class="campo"><label>Status inspeção</label><select id="statusInspecao"></select></div>
           <div class="campo full"><label>Observação</label><textarea id="observacao" placeholder="Opcional"></textarea></div>
@@ -420,7 +535,7 @@
 
         <div id="msgItem" class="msg"></div>
         <div class="historico">
-          <strong>Últimas conferências lançadas:</strong>
+          <strong>Últimas conferências lançadas</strong>
           <ul id="listaItens"></ul>
         </div>
       </div>
@@ -435,7 +550,6 @@
           <div class="mini-card"><span>Pend./Reprov.</span><strong id="resPendentes">0</strong></div>
         </div>
 
-        <!-- Botões de Relatório PDF e Excel -->
         <div id="resumoRelatorios" style="margin-top:16px; display:none; flex-direction:column; gap:10px;">
           <a id="btnDownloadPdf" href="#" target="_blank" class="btn-relatorio btn-pdf" style="display:none;">
             📄 Abrir PDF da Remessa
@@ -461,27 +575,13 @@
 </div>
 
 <script>
-  var LOGO_GEOMEMBRANA = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAR5A5ADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufoorevx30a9p9v7u9b6/5283x353yL014a/wA5528zL/3b7v8y5l0f4b14d+l+m/y9z638e9P0P5/6v59p9v83x3/2Q==';
-
+  // ════════════════════════════════════════════════════════
+  // EMPRESAS — selo tipográfico leve (sem imagem, carrega instantâneo)
+  // ════════════════════════════════════════════════════════
   var EMPRESAS_CONFIG = {
-    GEOMEMBRANA: {
-      nome: 'Geomembrana Geossintéticos',
-      tag: 'GEOMEMBRANA',
-      cor: '#007a3d',
-      logo: LOGO_GEOMEMBRANA
-    },
-    LONAFORT: {
-      nome: 'Lonafort',
-      tag: 'LONAFORT',
-      cor: '#005f73',
-      logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80" viewBox="0 0 120 80"><rect width="120" height="80" rx="16" fill="%23eef1f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="%23005f73">LONAFORT</text></svg>'
-    },
-    SIMPLES: {
-      nome: 'Simples',
-      tag: 'SIMPLES',
-      cor: '#1d3557',
-      logo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80" viewBox="0 0 120 80"><rect width="120" height="80" rx="16" fill="%23eef1f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="%231d3557">SIMPLES</text></svg>'
-    }
+    GEOMEMBRANA: { nome: 'Geomembrana Geossintéticos', tag: 'GEOMEMBRANA', sigla: 'GEO', cor: '#0c6b3f' },
+    LONAFORT:    { nome: 'Lonafort',                    tag: 'LONAFORT',    sigla: 'LNF', cor: '#065a63' },
+    SIMPLES:     { nome: 'Simples',                      tag: 'SIMPLES',     sigla: 'SIM', cor: '#1d3557' }
   };
 
   var API_URL = 'https://script.google.com/macros/s/AKfycbyE6lUsYrrVXHQIUyBC-BwHuYT36B9FgAVlT8rpyiF3VR3trJU2jJSe1Xk1fv2v6p3S/exec';
@@ -497,13 +597,10 @@
     empresaAtual = empresaKey;
     var cfg = EMPRESAS_CONFIG[empresaKey];
 
-    var logoBox = document.getElementById('logoEmpresaLogin');
-    if (logoBox) {
-      if (cfg.logo && cfg.logo.startsWith('data:image')) {
-        logoBox.innerHTML = '<img src="' + cfg.logo + '" alt="' + cfg.nome + '">';
-      } else {
-        logoBox.innerHTML = '<span style="font-size:2.5rem">🏢</span>';
-      }
+    var logoLogin = document.getElementById('logoEmpresaLogin');
+    if (logoLogin) {
+      logoLogin.style.background = cfg.cor;
+      logoLogin.textContent = cfg.sigla;
     }
 
     var nomeEl = document.getElementById('nomeEmpresaLogin');
@@ -514,11 +611,8 @@
 
     var topoLogo = document.getElementById('topoLogoEmpresa');
     if (topoLogo) {
-      if (cfg.logo && cfg.logo.startsWith('data:image')) {
-        topoLogo.innerHTML = '<img src="' + cfg.logo + '" alt="' + cfg.nome + '">';
-      } else {
-        topoLogo.innerHTML = '🏢';
-      }
+      topoLogo.style.background = cfg.cor;
+      topoLogo.textContent = cfg.sigla;
     }
   }
 
@@ -526,14 +620,13 @@
     var empresa = getVal('loginEmpresa');
     var email = getVal('loginEmail').toUpperCase();
     var senha = getVal('loginSenha');
-    var msg = document.getElementById('msgLogin');
     var btn = document.getElementById('btnLogin');
 
     if (!empresa) { mostrarErroLogin('Selecione a empresa.'); return; }
     if (!email) { mostrarErroLogin('Informe o e-mail corporativo.'); return; }
     if (!senha) { mostrarErroLogin('Informe a senha.'); return; }
 
-    msg.style.display = 'none';
+    document.getElementById('msgLogin').style.display = 'none';
     btn.disabled = true;
     btn.textContent = 'Autenticando...';
 
@@ -543,7 +636,7 @@
         btn.textContent = 'Entrar';
 
         if (!resp || !resp.ok) {
-          mostrarErroLogin(resp ? resp.mensagem : 'Erro ao realizar login.');
+          mostrarErroLogin(resp ? resp.mensagem : 'Não foi possível confirmar o login. Confira e-mail e senha.');
           return;
         }
 
@@ -560,28 +653,24 @@
       .catch(function(err) {
         btn.disabled = false;
         btn.textContent = 'Entrar';
-        mostrarErroLogin('Erro de conexão: ' + err.message);
+        mostrarErroLogin('Sem conexão com o servidor. Verifique a internet e tente de novo. (' + err.message + ')');
       });
   }
 
   function mostrarErroLogin(texto) {
     var msg = document.getElementById('msgLogin');
-    if (msg) {
-      msg.textContent = texto;
-      msg.style.display = 'block';
-    }
+    if (msg) { msg.textContent = texto; msg.style.display = 'block'; }
   }
 
   function mostrarApp() {
     document.getElementById('telaLogin').style.display = 'none';
     document.getElementById('telaApp').style.display = 'block';
 
-    var cfg = EMPRESAS_CONFIG[empresaAtual] || EMPRESAS_CONFIG.GEOMEMBRANA;
     selecionarEmpresa(empresaAtual);
 
     var userBox = document.getElementById('userLoggedBox');
     if (userBox && usuarioLogado) {
-      userBox.textContent = 'Usuário: ' + (usuarioLogado.nome || usuarioLogado.email) + ' | ' + (usuarioLogado.empresa || empresaAtual);
+      userBox.textContent = (usuarioLogado.nome || usuarioLogado.email) + ' · ' + (usuarioLogado.empresa || empresaAtual);
     }
 
     carregarApp();
@@ -647,10 +736,14 @@
   };
 
   function carregarApp() {
-    setMsg('msgRemessa', 'Carregando listas...', 'ok');
+    document.getElementById('btnIniciar').disabled = true;
+    setMsg('msgRemessa', 'Carregando cadastros da empresa…', 'carregando');
+
     chamarAPI('carregarDadosApp', {})
       .then(function(resp) {
-        if (!resp || !resp.ok) { setMsg('msgRemessa', 'Erro ao carregar cadastros.', 'erro'); return; }
+        document.getElementById('btnIniciar').disabled = false;
+
+        if (!resp || !resp.ok) { setMsg('msgRemessa', 'Não foi possível carregar os cadastros. Recarregue a página.', 'erro'); return; }
         cadastrosApp = resp.cadastros;
         preencherSelect('responsavel', cadastrosApp.responsaveis);
         preencherSelect('fornecedor', cadastrosApp.fornecedores);
@@ -662,7 +755,10 @@
         preencherSelect('materialItem', []);
         setMsg('msgRemessa', '', '');
       })
-      .catch(function(err) { setMsg('msgRemessa', 'Erro de conexão: ' + err.message, 'erro'); });
+      .catch(function(err) {
+        document.getElementById('btnIniciar').disabled = false;
+        setMsg('msgRemessa', 'Sem conexão com o servidor: ' + err.message, 'erro');
+      });
   }
 
   function preencherSelect(id, lista) {
@@ -695,7 +791,7 @@
     chamarAPI('iniciarRemessa', dados)
       .then(function(resp) {
         btn.disabled = false; btn.textContent = 'Iniciar remessa';
-        if (!resp || !resp.ok) { setMsg('msgRemessa', resp.mensagem || 'Erro ao iniciar remessa.', 'erro'); return; }
+        if (!resp || !resp.ok) { setMsg('msgRemessa', resp.mensagem || 'Não foi possível iniciar a remessa.', 'erro'); return; }
 
         estado.idRemessa = resp.idRemessa;
         estado.responsavel = dados.responsavel; estado.fornecedor = dados.fornecedor;
@@ -711,7 +807,7 @@
         document.getElementById('txtTipoConferencia').textContent = estado.tipoConferencia;
 
         document.getElementById('boxRemessa').style.display = 'block';
-        document.getElementById('boxContador').style.display = 'block';
+        document.getElementById('boxContador').style.display = 'flex';
         document.getElementById('txtContador').textContent = '0';
         document.getElementById('cardItem').classList.remove('oculto');
 
@@ -724,11 +820,11 @@
 
         setTimeout(function() {
           document.getElementById('cardItem').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 250);
+        }, 200);
       })
       .catch(function(err) {
         btn.disabled = false; btn.textContent = 'Iniciar remessa';
-        setMsg('msgRemessa', 'Erro: ' + err.message, 'erro');
+        setMsg('msgRemessa', 'Sem conexão com o servidor: ' + err.message, 'erro');
       });
   }
 
@@ -743,11 +839,13 @@
     if (estado.tipoConferencia === 'MICRAGEM' && !getVal('micragemInformada')) { setMsg('msgItem', 'Informe a micragem.', 'erro'); return; }
 
     var btn = document.getElementById('btnSalvarItem');
-    btn.disabled = true; btn.textContent = 'Salvando...';
+    btn.disabled = true; btn.textContent = 'Comprimindo fotos...';
 
     try {
       var fotoMaterial = await arquivoParaBase64('fotoMaterial');
       var fotoPeso     = await arquivoParaBase64('fotoPeso');
+
+      btn.textContent = 'Salvando...';
 
       var payload = {
         idRemessa: estado.idRemessa, responsavel: estado.responsavel,
@@ -764,22 +862,23 @@
       chamarAPI('salvarItemRemessa', payload)
         .then(function(resp) {
           btn.disabled = false; btn.textContent = 'Salvar conferência';
-          if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Erro ao salvar.', 'erro'); return; }
+          if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Não foi possível salvar o item.', 'erro'); return; }
 
           estado.itensLancados++;
           document.getElementById('txtContador').textContent = estado.itensLancados;
-          adicionarHistorico(estado.itensLancados + ' - ID ' + payload.idMaterial + ' | ' + payload.material + ' | ' + obterResumoMedicao(payload));
+          adicionarHistorico(estado.itensLancados + ' — ID ' + payload.idMaterial + ' · ' + payload.material + ' · ' + obterResumoMedicao(payload));
 
           limparItem();
           document.getElementById('materialItem').value = payload.material || estado.material;
           document.getElementById('unidade').value = payload.unidade;
           document.getElementById('condicaoMaterial').value = payload.condicaoMaterial;
           document.getElementById('statusInspecao').value = payload.statusInspecao;
+          atualizarUnidadeGauge();
           setMsg('msgItem', 'Conferência salva. Leia o próximo ID Material ou finalize a remessa.', 'ok');
         })
         .catch(function(err) {
           btn.disabled = false; btn.textContent = 'Salvar conferência';
-          setMsg('msgItem', 'Erro: ' + err.message, 'erro');
+          setMsg('msgItem', 'Sem conexão com o servidor: ' + err.message, 'erro');
         });
 
     } catch(err) {
@@ -793,12 +892,12 @@
     if (!confirm('Deseja finalizar a remessa ' + estado.idRemessa + '?')) return;
 
     var btn = document.getElementById('btnFinalizar');
-    btn.disabled = true; btn.textContent = 'Finalizando...';
+    btn.disabled = true; btn.textContent = 'Finalizando e gerando relatório...';
 
     chamarAPI('finalizarRemessa', { idRemessa: estado.idRemessa })
       .then(function(resp) {
         btn.disabled = false; btn.textContent = 'Finalizar remessa';
-        if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Erro ao finalizar.', 'erro'); return; }
+        if (!resp || !resp.ok) { setMsg('msgItem', resp.mensagem || 'Não foi possível finalizar a remessa.', 'erro'); return; }
 
         document.getElementById('cardResumo').style.display = 'block';
         document.getElementById('resumoTexto').textContent = 'Remessa ' + resp.idRemessa + ' finalizada com sucesso.';
@@ -808,7 +907,6 @@
         document.getElementById('resAprovados').textContent = resp.aprovados;
         document.getElementById('resPendentes').textContent = resp.pendentes + resp.reprovados;
 
-        // Trata os links do relatório gerado (PDF e Excel)
         var boxRel = document.getElementById('resumoRelatorios');
         var btnPdf = document.getElementById('btnDownloadPdf');
         var btnExcel = document.getElementById('btnDownloadExcel');
@@ -819,18 +917,8 @@
 
         if (linkPdf || linkExcel) {
           boxRel.style.display = 'flex';
-          if (linkPdf) {
-            btnPdf.href = linkPdf;
-            btnPdf.style.display = 'inline-flex';
-          } else {
-            btnPdf.style.display = 'none';
-          }
-          if (linkExcel) {
-            btnExcel.href = linkExcel;
-            btnExcel.style.display = 'inline-flex';
-          } else {
-            btnExcel.style.display = 'none';
-          }
+          if (linkPdf) { btnPdf.href = linkPdf; btnPdf.style.display = 'inline-flex'; } else { btnPdf.style.display = 'none'; }
+          if (linkExcel) { btnExcel.href = linkExcel; btnExcel.style.display = 'inline-flex'; } else { btnExcel.style.display = 'none'; }
         }
 
         document.getElementById('btnSalvarItem').disabled = true;
@@ -840,19 +928,35 @@
 
         setTimeout(function() {
           document.getElementById('cardResumo').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 250);
+        }, 200);
       })
       .catch(function(err) {
         btn.disabled = false; btn.textContent = 'Finalizar remessa';
-        setMsg('msgItem', 'Erro: ' + err.message, 'erro');
+        setMsg('msgItem', 'Sem conexão com o servidor: ' + err.message, 'erro');
       });
   }
 
   // ════════════════════════════════════════════════════════
-  // SCANNER — overlay na mesma página
+  // SCANNER — biblioteca carregada só quando o usuário abre a câmera
   // ════════════════════════════════════════════════════════
   var scannerAtivo = null;
   var scannerLido  = false;
+  var scannerLibPromise = null;
+
+  function garantirScannerLib() {
+    if (window.Html5Qrcode) return Promise.resolve();
+    if (scannerLibPromise) return scannerLibPromise;
+
+    scannerLibPromise = new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+      s.onload = function() { resolve(); };
+      s.onerror = function() { scannerLibPromise = null; reject(new Error('Não foi possível carregar o leitor.')); };
+      document.head.appendChild(s);
+    });
+
+    return scannerLibPromise;
+  }
 
   function tocarBip() {
     try {
@@ -874,13 +978,16 @@
     var statusEl = document.getElementById('scannerStatus');
     overlay.classList.add('ativo');
     statusEl.className = 'scanner-status';
-    statusEl.textContent = 'Iniciando câmera...';
+    statusEl.textContent = 'Carregando leitor...';
 
-    document.getElementById('scannerReader').innerHTML = '';
+    garantirScannerLib()
+      .then(function() {
+        statusEl.textContent = 'Iniciando câmera...';
+        document.getElementById('scannerReader').innerHTML = '';
+        scannerAtivo = new Html5Qrcode('scannerReader');
 
-    scannerAtivo = new Html5Qrcode('scannerReader');
-
-    Html5Qrcode.getCameras()
+        return Html5Qrcode.getCameras();
+      })
       .then(function(cameras) {
         if (!cameras || !cameras.length) {
           statusEl.className = 'scanner-status erro';
@@ -918,7 +1025,7 @@
       })
       .catch(function(e) {
         statusEl.className = 'scanner-status erro';
-        statusEl.textContent = '❌ Permissão negada: ' + String(e);
+        statusEl.textContent = '❌ ' + (e && e.message ? e.message : 'Permissão negada.');
       });
   }
 
@@ -926,15 +1033,8 @@
     if (scannerLido) return;
     scannerLido = true;
 
-    var cod = String(txt || '')
-      .replace('Ped:', '')
-      .split('|')[0]
-      .trim();
-
-    if (!cod) {
-      scannerLido = false;
-      return;
-    }
+    var cod = String(txt || '').replace('Ped:', '').split('|')[0].trim();
+    if (!cod) { scannerLido = false; return; }
 
     var campoIdMaterial = document.getElementById('idMaterial');
     if (campoIdMaterial) {
@@ -944,29 +1044,16 @@
     }
 
     var statusEl = document.getElementById('scannerStatus');
-    if (statusEl) {
-      statusEl.className = 'scanner-status ok';
-      statusEl.textContent = '✅ ID Material lido: ' + cod;
-    }
+    if (statusEl) { statusEl.className = 'scanner-status ok'; statusEl.textContent = '✅ ID Material lido: ' + cod; }
 
     setMsg('msgItem', 'ID Material preenchido: ' + cod, 'ok');
-
-    if (navigator.vibrate) {
-      navigator.vibrate([100]);
-    }
-
+    if (navigator.vibrate) navigator.vibrate([100]);
     tocarBip();
 
     setTimeout(function() {
       fecharScanner();
-      setTimeout(function() {
-        var campoIdMaterialFinal = document.getElementById('idMaterial');
-        if (campoIdMaterialFinal) {
-          campoIdMaterialFinal.value = cod;
-        }
-        focarCampoPrincipal();
-      }, 250);
-    }, 500);
+      focarCampoPrincipal();
+    }, 350);
   }
 
   function fecharScanner() {
@@ -1003,7 +1090,7 @@
     el.className = 'msg';
     if (!texto) { el.style.display = 'none'; el.textContent = ''; return; }
     el.textContent = texto;
-    el.classList.add(tipo === 'erro' ? 'erro' : 'ok');
+    el.classList.add(tipo === 'erro' ? 'erro' : tipo === 'carregando' ? 'carregando' : 'ok');
   }
 
   function arquivoParaBase64(inputId) {
@@ -1056,6 +1143,15 @@
     if (tipo === 'METRAGEM') document.getElementById('campoMetragem').classList.remove('oculto');
     if (tipo === 'MICRAGEM') document.getElementById('campoMicragem').classList.remove('oculto');
     atualizarRotulosFotos(tipo);
+    atualizarUnidadeGauge();
+  }
+
+  function atualizarUnidadeGauge() {
+    var val = getVal('unidade');
+    ['gaugeUnidadePeso','gaugeUnidadeMetragem','gaugeUnidadeMicragem'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val || '';
+    });
   }
 
   function atualizarRotulosFotos(tipo) {
